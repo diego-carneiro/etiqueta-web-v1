@@ -1,16 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useLogin, useRegister } from "@/api/hooks/useAuth";
 import {
   Dialog,
   DialogContent,
@@ -19,30 +12,25 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
-import { X } from "lucide-react";
+import { X, Eye, EyeOff } from "lucide-react";
+import { useLogin } from "@/api/hooks/loginAuth";
 
 type Props = {
-  selector:
-    | "sign-in"
-    | "sign-up"
-    | "recoverPassword"
-    | "recoverCode"
-    | "redefinePassword";
+  selector: "sign-in" | "recoverPassword" | "recoverCode" | "redefinePassword";
   setRecoverStage?: (stage: string) => void;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function UserForms({ selector, setRecoverStage }: Props) {
+export default function UserForms({ selector }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [customerTaxId, setCustomerTaxId] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [code, setCode] = useState("");
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
   const loginMutation = useLogin();
-  const registerMutation = useRegister();
 
   const handleLogin = () => {
     loginMutation.mutate(
@@ -52,164 +40,206 @@ export default function UserForms({ selector, setRecoverStage }: Props) {
           localStorage.setItem("token", data.token);
           navigate("/app/dashboard");
         },
-        onError: () => {
-          setIsErrorDialogOpen(true);
-        },
-      }
-    );
-  };
-
-  const handleRegister = () => {
-    registerMutation.mutate(
-      {
-        name,
-        email,
-        password,
-        phoneNumber,
-        customerTaxId,
-      },
-      {
-        onSuccess: () => {
-          navigate("/sign-in");
-        },
-        onError: (error) => {
-          console.error("Erro ao registrar:", error);
-        },
+        onError: () => setIsErrorDialogOpen(true),
       }
     );
   };
 
   return (
-    <div className="w-2xl min-h-screen flex items-center justify-center px-4">
+    <div className="relative h-screen flex items-center justify-center bg-[#3358A5]">
       {selector === "sign-in" && (
-        <Card className="w-full max-w-sm border border-border shadow-md rounded-xl">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-semibold text-center">
-              Entrar
-            </CardTitle>
-            <CardDescription className="text-muted-foreground text-center">
-              Bem-vindo de volta! Faça login para continuar.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Digite seu email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Digite sua senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <Button
-              className="w-full"
-              onClick={handleLogin}
-              disabled={loginMutation.isPending}
-            >
-              {loginMutation.isPending ? "Entrando..." : "Entrar"}
-            </Button>
-            <div className="flex flex-col items-center gap-1 text-sm text-center">
-              <Link to="/sign-up" className="text-primary hover:underline">
-                Não possui registro? Cadastre-se!
-              </Link>
-              <Link
-                to="/recover-password"
-                className="text-primary hover:underline"
-              >
-                Esqueceu a senha?
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="absolute top-8 left-1/2 -translate-x-1/2 flex items-center justify-center mb-72">
+          <img src="./img/etiquetalogomedium.png" alt="Logo" />
+        </div>
       )}
 
-      {selector === "sign-up" && (
-        <Card className="w-full max-w-sm border border-border shadow-md rounded-xl">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-semibold text-center">
-              Criar Conta
-            </CardTitle>
-            <CardDescription className="text-muted-foreground text-center">
-              Preencha os dados abaixo para se registrar.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Nome Completo</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Digite seu nome completo"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Telefone</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="Digite seu telefone"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="taxId">CPF ou CNPJ</Label>
-              <Input
-                id="taxId"
-                type="text"
-                placeholder="Digite seu CPF ou CNPJ"
-                value={customerTaxId}
-                onChange={(e) => setCustomerTaxId(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Digite seu email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Crie uma senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <Button
-              className="w-full"
-              onClick={handleRegister}
-              disabled={registerMutation.isPending}
-            >
-              {registerMutation.isPending ? "Registrando..." : "Registrar"}
-            </Button>
-            <p className="text-sm text-center">
-              <Link to="/sign-in" className="text-primary hover:underline">
-                Já tem conta? Entrar
-              </Link>
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      <div className="w-full max-w-[420px] px-6">
+        {selector === "sign-in" && (
+          <Card className="bg-transparent border-none shadow-none">
+            <CardContent className="flex flex-col gap-4 p-0">
+              <div>
+                <Label htmlFor="email" className="text-white mb-2">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Digite seu email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-white text-gray-800 placeholder:text-gray-500"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="password" className="text-white mb-2">
+                  Senha
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Digite sua senha"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-white text-gray-800 placeholder:text-gray-500 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              <Button
+                onClick={handleLogin}
+                disabled={loginMutation.isPending}
+                className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full mt-2"
+              >
+                {loginMutation.isPending ? "Entrando..." : "Entrar"}
+              </Button>
+
+              <Button
+                onClick={() => navigate("/sign-up")}
+                className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full"
+              >
+                Cadastrar
+              </Button>
+
+              <div className="text-center mt-1">
+                <Link
+                  to="/recover-password"
+                  className="text-white text-sm hover:underline"
+                >
+                  Esqueceu a senha?
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {selector === "recoverPassword" && (
+          <Card className="bg-transparent border-none shadow-none">
+            <CardContent className="flex flex-col gap-4 p-0">
+              <p className="text-center text-white text-sm">
+                Insira o Email utilizado para acessar a conta
+              </p>
+              <div>
+                <Label htmlFor="email" className="text-white mb-2">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Digite seu email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-white text-gray-800 placeholder:text-gray-500"
+                />
+              </div>
+              <Button
+                onClick={() => navigate("/recover-code")}
+                className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full"
+              >
+                Recuperar
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {selector === "recoverCode" && (
+          <Card className="bg-transparent border-none shadow-none">
+            <CardContent className="flex flex-col gap-4 p-0">
+              <p className="text-center text-white text-sm">
+                Insira o código que foi enviado ao Email digitado anteriormente
+              </p>
+              <div>
+                <Label htmlFor="code" className="text-white mb-2">
+                  Código
+                </Label>
+                <Input
+                  id="code"
+                  type="text"
+                  placeholder="Digite o código"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  className="bg-white text-gray-800 placeholder:text-gray-500"
+                />
+              </div>
+              <Button
+                onClick={() => navigate("/redefine-password")}
+                className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full"
+              >
+                Avançar
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {selector === "redefinePassword" && (
+          <Card className="bg-transparent border-none shadow-none">
+            <CardContent className="flex flex-col gap-4 p-0">
+              <div>
+                <Label htmlFor="password" className="text-white mb-2">
+                  Senha
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Digite sua senha"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-white text-gray-800 placeholder:text-gray-500 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="confirmPassword" className="text-white mb-2">
+                  Confirmar senha
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Digite sua senha novamente"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="bg-white text-gray-800 placeholder:text-gray-500 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <Button
+                onClick={() => alert("Senha alterada com sucesso!")}
+                className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full"
+              >
+                Alterar Senha
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       <Dialog open={isErrorDialogOpen} onOpenChange={setIsErrorDialogOpen}>
         <DialogContent className="sm:max-w-md">

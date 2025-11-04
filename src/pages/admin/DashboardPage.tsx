@@ -30,7 +30,7 @@ export interface Customer {
   plate?: string | null;
 }
 
-export default function DashboardPage() {
+export default function AdminDashboardPage() {
   const { data, isLoading, error } = useCustomer();
 
   const customers = useMemo(() => data?.data ?? [], [data]);
