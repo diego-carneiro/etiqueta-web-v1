@@ -14,7 +14,9 @@ import { useLabelsHistory } from "@/api/hooks/useLabels";
 
 export default function LogsPage() {
   const [employeeIdInput, setEmployeeIdInput] = useState("");
+  const [vehiclePlateInput, setVehiclePlateInput] = useState("");
   const [employeeIdFilter, setEmployeeIdFilter] = useState("");
+  const [vehiclePlateFilter, setVehiclePlateFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -25,7 +27,6 @@ export default function LogsPage() {
     error,
   } = useLabelsHistory();
 
-  // Ordenar pelo createdAt decrescente
   const sortedData = useMemo(() => {
     return [...historyData].sort(
       (a, b) =>
@@ -34,30 +35,37 @@ export default function LogsPage() {
   }, [historyData]);
 
   const filteredData = useMemo(() => {
-    if (!employeeIdFilter.trim()) return sortedData;
-    return sortedData.filter(
-      (log) =>
-        log.employeeId &&
-        log.employeeId.toLowerCase().includes(employeeIdFilter.toLowerCase())
-    );
-  }, [sortedData, employeeIdFilter]);
+    return sortedData.filter((log) => {
+      const matchesEmployee =
+        !employeeIdFilter.trim() ||
+        (log.employeeId &&
+          log.employeeId
+            .toLowerCase()
+            .includes(employeeIdFilter.toLowerCase()));
+      const matchesVehicle =
+        !vehiclePlateFilter.trim() ||
+        (log.vehicleLicensePlate &&
+          log.vehicleLicensePlate
+            .toLowerCase()
+            .includes(vehiclePlateFilter.toLowerCase()));
+      return matchesEmployee && matchesVehicle;
+    });
+  }, [sortedData, employeeIdFilter, vehiclePlateFilter]);
 
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredData.slice(startIndex, endIndex);
+    return filteredData.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredData, currentPage]);
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const handleFilter = () => {
     setEmployeeIdFilter(employeeIdInput.trim());
+    setVehiclePlateFilter(vehiclePlateInput.trim());
     setCurrentPage(1);
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  const handlePageChange = (page: number) => setCurrentPage(page);
 
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -73,14 +81,12 @@ export default function LogsPage() {
   const renderPagination = () => {
     if (totalPages <= 1) return null;
     const pages = [];
-    const startPage = Math.max(1, currentPage - 2);
-    const endPage = Math.min(totalPages, startPage + 4);
-    for (let i = startPage; i <= endPage; i++) {
+    for (let i = 1; i <= totalPages; i++) {
       pages.push(
         <span
           key={i}
-          className={`cursor-pointer hover:underline ${
-            i === currentPage ? "font-bold text-blue-600" : ""
+          className={`cursor-pointer hover:text-blue-600 font-medium ${
+            i === currentPage ? "text-blue-600 font-semibold" : "text-gray-500"
           }`}
           onClick={() => handlePageChange(i)}
         >
@@ -89,11 +95,11 @@ export default function LogsPage() {
       );
     }
     return (
-      <div className="flex justify-end pt-4 text-sm text-gray-500 space-x-2">
+      <div className="flex justify-end pt-6 text-sm text-gray-500 space-x-2">
         {pages}
         {currentPage < totalPages && (
           <span
-            className="cursor-pointer hover:underline"
+            className="cursor-pointer hover:text-blue-600 font-medium"
             onClick={() => handlePageChange(currentPage + 1)}
           >
             Próx
@@ -105,7 +111,7 @@ export default function LogsPage() {
 
   if (isError) {
     return (
-      <div className="p-20 bg-gray-100 min-h-screen">
+      <div className="p-10 bg-gray-100 min-h-screen">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Erro ao carregar histórico: {error?.message || "Erro desconhecido"}
         </div>
@@ -114,19 +120,36 @@ export default function LogsPage() {
   }
 
   return (
-    <div className="p-20 space-y-8 bg-gray-100 min-h-screen">
-      <div className="rounded-lg flex flex-wrap gap-4">
-        <Input
-          placeholder="ID do Funcionário"
-          className="max-w-[200px] bg-white border-none"
-          value={employeeIdInput}
-          onChange={(e) => setEmployeeIdInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleFilter();
-          }}
-        />
+    <div className="p-10 bg-gray-100 min-h-screen space-y-8">
+      <div className="bg-white rounded-xl shadow-sm p-6 flex flex-wrap items-end gap-4 w-140">
+        <div className="flex flex-col">
+          <label className="text-gray-600 font-medium mb-1">
+            ID do Funcionário
+          </label>
+          <Input
+            placeholder="Digite o ID"
+            className="bg-white border-none focus:ring-2 focus:ring-gray-200 focus:outline-none"
+            value={employeeIdInput}
+            onChange={(e) => setEmployeeIdInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleFilter()}
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-gray-600 font-medium mb-1">
+            Placa do veículo
+          </label>
+          <Input
+            placeholder="Digite a placa"
+            className="bg-white border-none focus:ring-2 focus:ring-gray-200 focus:outline-none"
+            value={vehiclePlateInput}
+            onChange={(e) => setVehiclePlateInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleFilter()}
+          />
+        </div>
+
         <Button
-          className="bg-yellow-500 text-white hover:bg-yellow-600"
+          className="bg-green-500 text-white hover:bg-green-600 font-semibold px-6 py-2 rounded-md"
           onClick={handleFilter}
           disabled={isLoading}
         >
@@ -136,59 +159,70 @@ export default function LogsPage() {
               Carregando...
             </>
           ) : (
-            "Filtrar"
+            "Buscar"
           )}
         </Button>
       </div>
 
-      <div className="bg-white rounded-lg p-4">
-        {isLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin" />
-            <span className="ml-2">Carregando histórico...</span>
-          </div>
-        ) : (
-          <Table className="border-separate border-spacing-0">
-            <TableHeader>
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <Table className="w-full">
+          <TableHeader>
+            <TableRow className="border-b border-gray-200">
+              <TableHead className="text-gray-600 font-semibold text-left">
+                Funcionário
+              </TableHead>
+              <TableHead className="text-gray-600 font-semibold text-left">
+                Placa do Veículo
+              </TableHead>
+              <TableHead className="text-gray-600 font-semibold text-left">
+                Data e Hora
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
               <TableRow>
-                <TableHead>Nome do Funcionário</TableHead>
-                <TableHead>Placa do Veículo</TableHead>
-                <TableHead>Data e Hora</TableHead>
+                <TableCell
+                  colSpan={3}
+                  className="text-center py-6 text-gray-400"
+                >
+                  Carregando histórico...
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedData.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={3}
-                    className="text-center py-8 text-gray-500"
-                  >
-                    {employeeIdFilter.trim()
-                      ? "Nenhum registro encontrado para este funcionário"
-                      : "Nenhum registro encontrado"}
+            ) : paginatedData.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={3}
+                  className="text-center py-6 text-gray-500"
+                >
+                  Nenhum registro encontrado
+                </TableCell>
+              </TableRow>
+            ) : (
+              paginatedData.map((log, index) => (
+                <TableRow
+                  key={`${log.employeeId}-${log.vehicleId}-${index}`}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors text-gray-700"
+                >
+                  <TableCell className="py-4">{log.employeeName}</TableCell>
+                  <TableCell className="py-4">
+                    {log.vehicleLicensePlate}
+                  </TableCell>
+                  <TableCell className="py-4">
+                    {formatDateTime(log.createdAt)}
                   </TableCell>
                 </TableRow>
-              ) : (
-                paginatedData.map((log, index) => (
-                  <TableRow key={`${log.employeeId}-${log.vehicleId}-${index}`}>
-                    <TableCell>{log.employeeName}</TableCell>
-                    <TableCell>{log.vehicleLicensePlate}</TableCell>
-                    <TableCell>{formatDateTime(log.createdAt)}</TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        )}
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
 
-      {paginatedData.length > 0 && renderPagination()}
+      {filteredData.length > 0 && renderPagination()}
 
       {filteredData.length > 0 && (
         <div className="text-sm text-gray-500 text-center">
           Mostrando {paginatedData.length} de {filteredData.length} registros
-          {employeeIdFilter.trim() &&
-            ` (filtrados de ${historyData.length} total)`}
         </div>
       )}
     </div>

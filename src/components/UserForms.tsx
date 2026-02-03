@@ -13,14 +13,15 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { X, Eye, EyeOff } from "lucide-react";
-import { useLogin } from "@/api/hooks/loginAuth";
+import { useEmployeeLogin, useAdminLogin } from "@/api/hooks/loginAuth";
 
 type Props = {
   selector: "sign-in" | "recoverPassword" | "recoverCode" | "redefinePassword";
   setRecoverStage?: (stage: string) => void;
+  userType?: "employee" | "admin";
 };
 
-export default function UserForms({ selector }: Props) {
+export default function UserForms({ selector, userType = "employee" }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -30,15 +31,23 @@ export default function UserForms({ selector }: Props) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
-  const loginMutation = useLogin();
+
+  const adminLogin = useAdminLogin();
+  const employeeLogin = useEmployeeLogin();
+  const loginMutation = userType === "admin" ? adminLogin : employeeLogin;
 
   const handleLogin = () => {
     loginMutation.mutate(
       { email, password },
       {
         onSuccess: (data) => {
-          localStorage.setItem("token", data.token);
-          navigate("/app/dashboard");
+          localStorage.setItem(
+            userType === "admin" ? "adminToken" : "token",
+            data.token
+          );
+          navigate(
+            userType === "admin" ? "/admin/app/dashboard" : "/app/dashboard"
+          );
         },
         onError: () => setIsErrorDialogOpen(true),
       }
@@ -49,7 +58,7 @@ export default function UserForms({ selector }: Props) {
     <div className="relative h-screen flex items-center justify-center bg-[#3358A5]">
       {selector === "sign-in" && (
         <div className="absolute top-8 left-1/2 -translate-x-1/2 flex items-center justify-center mb-72">
-          <img src="./img/etiquetalogomedium.png" alt="Logo" />
+          <img src="../img/etiquetalogomedium.png" alt="Logo" />
         </div>
       )}
 
@@ -57,6 +66,7 @@ export default function UserForms({ selector }: Props) {
         {selector === "sign-in" && (
           <Card className="bg-transparent border-none shadow-none">
             <CardContent className="flex flex-col gap-4 p-0">
+            <p className="text-white mt-30 mb-6 text-center text-lg font-bold">Entre com sua conta de funcionário</p>
               <div>
                 <Label htmlFor="email" className="text-white mb-2">
                   Email
@@ -102,14 +112,16 @@ export default function UserForms({ selector }: Props) {
                 {loginMutation.isPending ? "Entrando..." : "Entrar"}
               </Button>
 
-              <Button
-                onClick={() => navigate("/sign-up")}
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full"
-              >
-                Cadastrar
-              </Button>
+              {userType === "employee" && (
+                <Button
+                  onClick={() => navigate("/sign-up")}
+                  className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full"
+                >
+                  Cadastrar
+                </Button>
+              )}
 
-              <div className="text-center mt-1">
+              <div className="text-center mt-1 font-bold">
                 <Link
                   to="/recover-password"
                   className="text-white text-sm hover:underline"

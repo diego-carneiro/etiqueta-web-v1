@@ -1,7 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
-import { login } from "@/services/loginService";
+import { employeeLogin, adminLogin } from "../services/loginService";
 
-export const useLogin = () =>
+export const useEmployeeLogin = () =>
   useMutation({
-    mutationFn: login,
+    mutationFn: employeeLogin,
+  });
+
+export const useAdminLogin = () =>
+  useMutation({
+    mutationFn: adminLogin,
   });

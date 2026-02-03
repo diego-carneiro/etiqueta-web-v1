@@ -97,7 +97,7 @@ export default function EmployeeRegister() {
           />
         </div>
 
-        <div className="flex flex-col space-y-1 mt-20">
+        <div className="flex flex-col space-y-1 mt-16">
           <label className="text-sm font-medium text-gray-700">CPF</label>
           <Input
             name="taxId"
@@ -125,7 +125,7 @@ export default function EmployeeRegister() {
           <Button
             type="submit"
             disabled={isPending}
-            className="bg-yellow-400 text-white hover:bg-yellow-500 w-full"
+            className="bg-green-500 text-white hover:bg-green-600 w-full"
           >
             {isPending ? "Cadastrando..." : "Cadastrar"}
           </Button>

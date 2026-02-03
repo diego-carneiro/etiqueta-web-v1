@@ -1,22 +1,58 @@
-import { Home, Users, Settings, LogOut, FileText } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useLocation, Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import {
+  Home,
+  Users,
+  Settings,
+  LogOut,
+  FileText,
+  Building2,
+  Wallet,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useBasePath } from "@/hooks/useBasePath";
 
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-
-  const menuItems = [
-    { label: "Painel", icon: Home, path: "/app/dashboard" },
-    { label: "Cliente", icon: FileText, path: "/app/client" },
-    { label: "Funcionários", icon: Users, path: "/app/employees" },
-    { label: "Histórico", icon: Settings, path: "/app/logs" },
-  ];
+  const [isAdminDropdownOpen, setIsAdminDropdownOpen] = useState(false);
+  const basePath = useBasePath();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("user");
     navigate("/sign-in");
   };
+
+  const isAdmin = basePath.includes("/admin");
+
+  const baseMenuItems = [
+    { label: "Dashboard", icon: Home, path: `${basePath}/dashboard` },
+    { label: "Clientes", icon: FileText, path: `${basePath}/clients` },
+    { label: "Funcionários", icon: Users, path: `${basePath}/employees` },
+    { label: "Histórico", icon: Settings, path: `${basePath}/logs` },
+  ];
+
+  const adminExtraItems = [
+    {
+      label: "Administrativo",
+      icon: Wallet,
+      subItems: [
+        {
+          label: "Lojas",
+          icon: Building2,
+          path: `${basePath}/service-centers`,
+        },
+        { label: "Financeiro", icon: Wallet, path: `${basePath}/finances` },
+      ],
+    },
+  ];
+
+  const reorderedMenu = isAdmin
+    ? [baseMenuItems[0], ...adminExtraItems, ...baseMenuItems.slice(1)]
+    : baseMenuItems;
 
   return (
     <aside className="w-64 h-screen bg-[#004AAD] p-6 flex flex-col">
@@ -33,24 +69,61 @@ export default function Sidebar() {
       </h2>
 
       <nav className="flex flex-col gap-2">
-        {menuItems.map(({ label, icon: Icon, path }) => {
-          const isActive = location.pathname === path;
+        {reorderedMenu.map((item) => {
+          if ("subItems" in item) {
+            return (
+              <div key={item.label}>
+                <button
+                  onClick={() => setIsAdminDropdownOpen(!isAdminDropdownOpen)}
+                  className="flex items-center justify-between w-full px-4 py-2 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/10 transition-colors duration-150"
+                >
+                  <div className="flex items-center gap-3">
+                    <item.icon size={18} className="text-white" />
+                    <span className="font-semibold text-white">
+                      {item.label}
+                    </span>
+                  </div>
+                  {isAdminDropdownOpen ? (
+                    <ChevronUp size={16} className="text-white" />
+                  ) : (
+                    <ChevronDown size={16} className="text-white" />
+                  )}
+                </button>
+
+                {isAdminDropdownOpen && (
+                  <div className="ml-9 mt-2 flex flex-col gap-2">
+                    {item.subItems.map((sub) => (
+                      <Link
+                        key={sub.path}
+                        to={sub.path}
+                        className="flex items-center gap-3 px-2 py-1.5 rounded-md text-sm text-white"
+                      >
+                        <sub.icon size={16} />
+                        {sub.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          const isActive = location.pathname === item.path;
           return (
             <Link
-              key={path}
-              to={path}
-              className={cn(
-                "flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition-colors duration-150",
+              key={item.path}
+              to={item.path}
+              className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition-colors duration-150 ${
                 isActive
                   ? "bg-white/15 text-white font-semibold"
                   : "text-white/70 hover:text-white hover:bg-white/10"
-              )}
+              }`}
             >
-              <Icon
+              <item.icon
                 size={18}
-                className={cn(isActive ? "text-white" : "text-white/80")}
+                className={isActive ? "text-white" : "text-white/80"}
               />
-              {label}
+              {item.label}
             </Link>
           );
         })}
