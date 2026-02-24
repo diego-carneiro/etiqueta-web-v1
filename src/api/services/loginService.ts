@@ -5,8 +5,8 @@ type LoginParams = {
   password: string;
 };
 
-export const employeeLogin = async (params: LoginParams) => {
-  const response = await api.post("/company/login", params);
+export const companyLogin = async (params: LoginParams) => {
+  const response = await api.post("/companies/login", params);
   return response.data;
 };
 

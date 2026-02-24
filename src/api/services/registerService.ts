@@ -1,14 +1,38 @@
-import api from "../api/axios";
+import api from "../axios";
 
-type RegisterParams = {
-  name: string;
+export type CompanyRegisterParams = {
+  legalName: string;
+  tradeName: string;
+  taxId: string;
   email: string;
   password: string;
-  phoneNumber: string;
-  customerTaxId: string;
+  socialMedia: string;
+  websiteUrl: string;
+  address: {
+    postalCode: string;
+    street: string;
+    number: number;
+    additionalInfo: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+  };
+  phoneNumbers: {
+    countryCode: number;
+    nationalNumber: number;
+    extension: number;
+    phoneNumber: string;
+  }[];
+  providedServiceIds: number[];
+  openingHours: {
+    day: number;
+    start: string;
+    end: string;
+    description: string;
+  }[];
 };
 
-export const register = async (params: RegisterParams) => {
-  const response = await api.post("/customers", params);
-  return response.data;
+export const registerCompany = async (params: CompanyRegisterParams) => {
+  const { data } = await api.post("/companies", params);
+  return data;
 };

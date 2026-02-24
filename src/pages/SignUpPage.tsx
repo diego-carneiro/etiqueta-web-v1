@@ -1,33 +1,111 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import TermsOfUse from "@/components/TermsOfUse";
-import ErrorModal from "@/components/ErrorModal.tsx";
+import SuccessModal from "@/components/ui/SuccessModal";
+import ErrorModal from "@/components/ErrorModal";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
+import { useRegisterCompany } from "@/api/hooks/useRegisterAuth";
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const ENABLE_VALIDATIONS = import.meta.env.VITE_ENABLE_VALIDATIONS !== "false";
+
+const STEPS = [
+  "Email e senha",
+  "Informações loja",
+  "Serviços",
+  "Dias e Horários",
+  "Termos de uso",
+];
+
+const SERVICOS = [
+  "Óleo motor",
+  "Óleo de freio",
+  "Filtro cabine",
+  "Óleo de câmbio manual",
+  "Óleo de Direção",
+  "Outros serviços",
+  "Óleo de câmbio automático parcial",
+  "Limpeza arrefecimento",
+  "Filtro de óleo",
+  "Óleo de câmbio automático comple.",
+  "Filtro de Ar",
+  "Filtro de combus",
+];
+
+const DIAS_DEFAULT = [
+  { dia: "Segunda-feira", ativo: false, inicio: "08:00", fim: "18:00" },
+  { dia: "Terça-feira", ativo: false, inicio: "08:00", fim: "18:00" },
+  { dia: "Quarta-feira", ativo: false, inicio: "08:00", fim: "18:00" },
+  { dia: "Quinta-feira", ativo: false, inicio: "08:00", fim: "18:00" },
+  { dia: "Sexta-feira", ativo: false, inicio: "08:00", fim: "18:00" },
+  { dia: "Sábado", ativo: false, inicio: "08:00", fim: "15:00" },
+  { dia: "Domingo", ativo: false, inicio: "08:00", fim: "15:00" },
+];
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function generateTimeSlots(): string[] {
+  const slots: string[] = [];
+  for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      slots.push(
+        `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`,
+      );
+    }
+  }
+  return slots;
+}
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type Step2Data = {
+  cnpj: string;
+  razaoSocial: string;
+  nomeFantasia: string;
+  email: string;
+  cep: string;
+  rua: string;
+  numero: string;
+  bairro: string;
+  redesSociais: string;
+  siteLoja: string;
+};
+
+type Horario = {
+  dia: string;
+  ativo: boolean;
+  inicio: string;
+  fim: string;
+};
+
+type ModalState = { open: boolean; title: string; message: string };
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function SignUpPage() {
-  // ⚙️ MODO DE DESENVOLVIMENTO - Mude para true para habilitar validações
-  const ENABLE_VALIDATIONS = true;
-
-  const [email, setEmail] = useState("");
-  const [step, setStep] = useState(1);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [aceitouTermos, setAceitouTermos] = useState(false);
+  const { mutateAsync: registerCompany } = useRegisterCompany();
   const navigate = useNavigate();
 
-  const [modalState, setModalState] = useState({
-    open: false,
-    title: "",
-    message: "",
-  });
+  // Memoized time slots — only computed once
+  const horariosDisponiveis = useMemo(() => generateTimeSlots(), []);
 
-  const [step2Data, setStep2Data] = useState({
+  // Step state
+  const [step, setStep] = useState(1);
+
+  // Step 1
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  // Step 2
+  const [step2Data, setStep2Data] = useState<Step2Data>({
     cnpj: "",
     razaoSocial: "",
     nomeFantasia: "",
@@ -39,95 +117,63 @@ export default function SignUpPage() {
     redesSociais: "",
     siteLoja: "",
   });
-  const [step2Errors, setStep2Errors] = useState<Record<string, boolean>>({});
+  const [step2Errors, setStep2Errors] = useState<
+    Partial<Record<keyof Step2Data, boolean>>
+  >({});
 
-  const [step3Data, setStep3Data] = useState({
-    servicosSelecionados: [] as string[],
-    horarios: [
-      { dia: "Segunda-feira", ativo: false, inicio: "08:00", fim: "18:00" },
-      { dia: "Terça-feira", ativo: false, inicio: "08:00", fim: "18:00" },
-      { dia: "Quarta-feira", ativo: false, inicio: "08:00", fim: "18:00" },
-      { dia: "Quinta-feira", ativo: false, inicio: "08:00", fim: "18:00" },
-      { dia: "Sexta-feira", ativo: false, inicio: "08:00", fim: "18:00" },
-      { dia: "Sábado", ativo: false, inicio: "08:00", fim: "15:00" },
-      { dia: "Domingo", ativo: false, inicio: "08:00", fim: "15:00" },
-    ],
+  // Step 3 — split into two distinct states
+  const [servicosSelecionados, setServicosSelecionados] = useState<string[]>(
+    [],
+  );
+  const [horarios, setHorarios] = useState<Horario[]>(DIAS_DEFAULT);
+
+  // Step 5
+  const [aceitouTermos, setAceitouTermos] = useState(false);
+
+  // Modals
+  const [errorModal, setErrorModal] = useState<ModalState>({
+    open: false,
+    title: "",
+    message: "",
   });
+  const [successModal, setSuccessModal] = useState(false);
 
-  const steps = [
-    "Email e senha",
-    "Informações loja",
-    "Serviços",
-    "Dias e Horários",
-    "Termos de uso",
-  ];
+  // ─── Modal helpers ──────────────────────────────────────────────────────────
 
-  const showModal = (title: string, message: string) => {
-    setModalState({ open: true, title, message });
-  };
+  const showError = (title: string, message: string) =>
+    setErrorModal({ open: true, title, message });
 
-  const gerarHorarios = () => {
-    const horarios: string[] = [];
-    for (let h = 0; h < 24; h++) {
-      for (let m = 0; m < 60; m += 30) {
-        const hora = h.toString().padStart(2, "0");
-        const minuto = m.toString().padStart(2, "0");
-        horarios.push(`${hora}:${minuto}`);
-      }
-    }
-    return horarios;
-  };
+  // ─── Navigation ─────────────────────────────────────────────────────────────
 
-  const horariosDisponiveis = gerarHorarios();
-
-  const nextStep = () => setStep((s) => Math.min(s + 1, steps.length));
+  const nextStep = () => setStep((s) => Math.min(s + 1, STEPS.length));
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
 
-  // STEP 1 - Validação
-  const handleNextStep = () => {
-    if (!ENABLE_VALIDATIONS) {
-      nextStep();
-      return;
-    }
+  // ─── Step validators ────────────────────────────────────────────────────────
 
+  const validateStep1 = (): boolean => {
     if (!email || !password || !confirm) {
-      showModal(
+      showError(
         "Campos obrigatórios",
-        "Todos os campos devem ser preenchidos."
+        "Todos os campos devem ser preenchidos.",
       );
-      return;
+      return false;
     }
-
     if (password !== confirm) {
-      showModal(
+      showError(
         "Senhas não conferem",
-        "As senhas digitadas não são iguais. Verifique e tente novamente."
+        "As senhas digitadas não são iguais. Verifique e tente novamente.",
       );
-      return;
+      return false;
     }
-
-    nextStep();
+    return true;
   };
 
-  // STEP 2 - Validação
-  const handleStep2Change = (field: keyof typeof step2Data, value: string) => {
-    setStep2Data((prev) => ({ ...prev, [field]: value }));
-    if (value.trim()) {
-      setStep2Errors((prev) => ({ ...prev, [field]: false }));
-    }
-  };
-
-  const handleStep2Next = () => {
-    if (!ENABLE_VALIDATIONS) {
-      nextStep();
-      return;
-    }
-
-    const errors: Record<string, boolean> = {};
+  const validateStep2 = (): boolean => {
+    const errors: Partial<Record<keyof Step2Data, boolean>> = {};
     let hasError = false;
 
-    Object.entries(step2Data).forEach(([key, value]) => {
-      if (!value.trim()) {
+    (Object.keys(step2Data) as (keyof Step2Data)[]).forEach((key) => {
+      if (!step2Data[key].trim()) {
         errors[key] = true;
         hasError = true;
       }
@@ -135,121 +181,157 @@ export default function SignUpPage() {
 
     if (hasError) {
       setStep2Errors(errors);
-      showModal(
+      showError(
         "Campos obrigatórios",
-        "Todos os campos devem ser preenchidos antes de avançar. Verifique os campos destacados em vermelho."
+        "Todos os campos devem ser preenchidos antes de avançar. Verifique os campos destacados em vermelho.",
       );
-      return;
+      return false;
     }
-
-    nextStep();
+    return true;
   };
 
-  // STEP 3 - Validação (Serviços)
-  const handleStep3Next = () => {
-    if (!ENABLE_VALIDATIONS) {
-      nextStep();
-      return;
-    }
-
-    if (step3Data.servicosSelecionados.length === 0) {
-      showModal(
+  const validateStep3 = (): boolean => {
+    if (servicosSelecionados.length === 0) {
+      showError(
         "Nenhum serviço selecionado",
-        "Por favor, selecione pelo menos um serviço prestado antes de avançar."
+        "Por favor, selecione pelo menos um serviço prestado antes de avançar.",
       );
-      return;
+      return false;
     }
-
-    nextStep();
+    return true;
   };
 
-  // STEP 4 - Validação (Horários)
-  const handleStep4Next = () => {
-    if (!ENABLE_VALIDATIONS) {
-      nextStep();
-      return;
-    }
-
-    const algumDiaAtivo = step3Data.horarios.some((h) => h.ativo);
-
-    if (!algumDiaAtivo) {
-      showModal(
+  const validateStep4 = (): boolean => {
+    if (!horarios.some((h) => h.ativo)) {
+      showError(
         "Nenhum horário definido",
-        "Por favor, ative e defina o horário de funcionamento para pelo menos um dia da semana."
+        "Por favor, ative e defina o horário de funcionamento para pelo menos um dia da semana.",
       );
-      return;
+      return false;
     }
-
-    nextStep();
+    return true;
   };
 
-  // STEP 5 - Finalizar (Termos)
-  const handleFinalize = () => {
-    if (ENABLE_VALIDATIONS && !aceitouTermos) {
-      showModal(
-        "Termos não aceitos",
-        "Você deve aceitar os termos de uso antes de finalizar o cadastro."
-      );
-      return;
-    }
+  // ─── Step advance map ───────────────────────────────────────────────────────
 
-    console.log("Finalizar cadastro", {
-      step1: { password, confirm },
-      step2: step2Data,
-      step3: step3Data,
-      aceitouTermos,
-    });
-
-    alert("Cadastro realizado com sucesso!");
+  const VALIDATORS: Record<number, () => boolean> = {
+    1: validateStep1,
+    2: validateStep2,
+    3: validateStep3,
+    4: validateStep4,
   };
 
-  // STEP 3 e 4 - Funções
+  const handleAdvance = () => {
+    if (!ENABLE_VALIDATIONS || !VALIDATORS[step] || VALIDATORS[step]()) {
+      nextStep();
+    }
+  };
+
+  // ─── Step 2 field handler ───────────────────────────────────────────────────
+
+  const handleStep2Change = (field: keyof Step2Data, value: string) => {
+    setStep2Data((prev) => ({ ...prev, [field]: value }));
+    if (value.trim()) {
+      setStep2Errors((prev) => ({ ...prev, [field]: false }));
+    }
+  };
+
+  // ─── Step 3 handlers ────────────────────────────────────────────────────────
+
   const toggleServico = (servico: string) => {
-    setStep3Data((prev) => ({
-      ...prev,
-      servicosSelecionados: prev.servicosSelecionados.includes(servico)
-        ? prev.servicosSelecionados.filter((s) => s !== servico)
-        : [...prev.servicosSelecionados, servico],
-    }));
+    setServicosSelecionados((prev) =>
+      prev.includes(servico)
+        ? prev.filter((s) => s !== servico)
+        : [...prev, servico],
+    );
   };
+
+  // ─── Step 4 handlers ────────────────────────────────────────────────────────
 
   const toggleDia = (index: number) => {
-    setStep3Data((prev) => {
-      const newHorarios = [...prev.horarios];
-      newHorarios[index] = {
-        ...newHorarios[index],
-        ativo: !newHorarios[index].ativo,
-      };
-      return { ...prev, horarios: newHorarios };
-    });
+    setHorarios((prev) =>
+      prev.map((h, i) => (i === index ? { ...h, ativo: !h.ativo } : h)),
+    );
   };
 
   const updateHorarioDia = (
     index: number,
     field: "inicio" | "fim",
-    value: string
+    value: string,
   ) => {
-    setStep3Data((prev) => {
-      const newHorarios = [...prev.horarios];
-      newHorarios[index] = { ...newHorarios[index], [field]: value };
-      return { ...prev, horarios: newHorarios };
-    });
+    setHorarios((prev) =>
+      prev.map((h, i) => (i === index ? { ...h, [field]: value } : h)),
+    );
   };
 
-  // Função para determinar qual handler usar
-  const handleAdvance = () => {
-    if (step === 1) return handleNextStep();
-    if (step === 2) return handleStep2Next();
-    if (step === 3) return handleStep3Next();
-    if (step === 4) return handleStep4Next();
+  // ─── Final submit ────────────────────────────────────────────────────────────
+
+  const handleFinalize = async () => {
+    if (ENABLE_VALIDATIONS && !aceitouTermos) {
+      showError(
+        "Termos não aceitos",
+        "Você deve aceitar os termos de uso antes de finalizar o cadastro.",
+      );
+      return;
+    }
+
+    try {
+      await registerCompany({
+        legalName: step2Data.razaoSocial,
+        tradeName: step2Data.nomeFantasia,
+        taxId: step2Data.cnpj,
+        email: email,
+        password: password,
+        socialMedia: step2Data.redesSociais,
+        websiteUrl: step2Data.siteLoja,
+        address: {
+          postalCode: step2Data.cep,
+          street: step2Data.rua,
+          number: Number(step2Data.numero),
+          additionalInfo: "",
+          neighborhood: step2Data.bairro,
+          city: "",
+          state: "",
+        },
+        phoneNumbers: [],
+        providedServiceIds: servicosSelecionados.map((_, i) => i + 1),
+        openingHours: horarios
+          .filter((h) => h.ativo)
+          .map((h, index) => ({
+            day: index,
+            start: h.inicio,
+            end: h.fim,
+            description: h.dia,
+          })),
+      });
+
+      setSuccessModal(true);
+    } catch (error: any) {
+      showError(
+        "Erro ao cadastrar",
+        error?.response?.data?.message ??
+          "Erro inesperado ao realizar cadastro.",
+      );
+    }
   };
+
+  // ─── Input class helper ──────────────────────────────────────────────────────
+
+  const inputClass = (hasError?: boolean) =>
+    `bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
+      hasError
+        ? "border-2 border-red-500 focus-visible:ring-red-500"
+        : "border border-gray-300"
+    }`;
+
+  // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
     <div className="w-screen h-screen flex bg-[#E5E5E5] overflow-hidden">
       {/* SIDEBAR */}
       <aside className="w-1/4 bg-[#3358A5] flex items-center justify-center">
         <ul className="flex flex-col gap-10">
-          {steps.map((label, i) => {
+          {STEPS.map((label, i) => {
             const idx = i + 1;
             const active = idx === step;
             return (
@@ -278,7 +360,7 @@ export default function SignUpPage() {
       <main className="flex-1 flex flex-col bg-[#E5E5E5]">
         <div className="flex-1 flex items-center justify-center overflow-y-auto px-4 py-8">
           <div className="w-full max-w-[900px]">
-            {/* STEP 1 - Email e Senha */}
+            {/* STEP 1 — Email e Senha */}
             {step === 1 && (
               <Card className="bg-transparent border-none shadow-none w-full max-w-[420px] mx-auto">
                 <CardContent className="flex flex-col gap-4 p-0">
@@ -349,7 +431,7 @@ export default function SignUpPage() {
               </Card>
             )}
 
-            {/* STEP 2 - Informações da Loja */}
+            {/* STEP 2 — Informações da Loja */}
             {step === 2 && (
               <div className="w-full space-y-3">
                 <Card className="bg-white border border-gray-200 shadow-sm">
@@ -371,74 +453,44 @@ export default function SignUpPage() {
                       Dados da Empresa
                     </h3>
                     <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-[#3358A5] mb-1 text-xs block">
-                          CNPJ
-                        </Label>
-                        <Input
-                          value={step2Data.cnpj}
-                          onChange={(e) =>
-                            handleStep2Change("cnpj", e.target.value)
-                          }
-                          className={`bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
-                            step2Errors.cnpj
-                              ? "border-2 border-red-500 focus-visible:ring-red-500"
-                              : "border border-gray-300"
-                          }`}
-                          placeholder="00.000.000/0000-00"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-[#3358A5] mb-1 text-xs block">
-                          Razão social
-                        </Label>
-                        <Input
-                          value={step2Data.razaoSocial}
-                          onChange={(e) =>
-                            handleStep2Change("razaoSocial", e.target.value)
-                          }
-                          className={`bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
-                            step2Errors.razaoSocial
-                              ? "border-2 border-red-500 focus-visible:ring-red-500"
-                              : "border border-gray-300"
-                          }`}
-                          placeholder="Empresa LTDA"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-[#3358A5] mb-1 text-xs block">
-                          Nome fantasia
-                        </Label>
-                        <Input
-                          value={step2Data.nomeFantasia}
-                          onChange={(e) =>
-                            handleStep2Change("nomeFantasia", e.target.value)
-                          }
-                          className={`bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
-                            step2Errors.nomeFantasia
-                              ? "border-2 border-red-500 focus-visible:ring-red-500"
-                              : "border border-gray-300"
-                          }`}
-                          placeholder="Nome da loja"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-[#3358A5] mb-1 text-xs block">
-                          E-mail
-                        </Label>
-                        <Input
-                          value={step2Data.email}
-                          onChange={(e) =>
-                            handleStep2Change("email", e.target.value)
-                          }
-                          className={`bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
-                            step2Errors.email
-                              ? "border-2 border-red-500 focus-visible:ring-red-500"
-                              : "border border-gray-300"
-                          }`}
-                          placeholder="email@exemplo.com"
-                        />
-                      </div>
+                      {(
+                        [
+                          {
+                            key: "cnpj",
+                            label: "CNPJ",
+                            placeholder: "00.000.000/0000-00",
+                          },
+                          {
+                            key: "razaoSocial",
+                            label: "Razão social",
+                            placeholder: "Empresa LTDA",
+                          },
+                          {
+                            key: "nomeFantasia",
+                            label: "Nome fantasia",
+                            placeholder: "Nome da loja",
+                          },
+                          {
+                            key: "email",
+                            label: "E-mail",
+                            placeholder: "email@exemplo.com",
+                          },
+                        ] as const
+                      ).map(({ key, label, placeholder }) => (
+                        <div key={key}>
+                          <Label className="text-[#3358A5] mb-1 text-xs block">
+                            {label}
+                          </Label>
+                          <Input
+                            value={step2Data[key]}
+                            onChange={(e) =>
+                              handleStep2Change(key, e.target.value)
+                            }
+                            className={inputClass(step2Errors[key])}
+                            placeholder={placeholder}
+                          />
+                        </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -468,74 +520,44 @@ export default function SignUpPage() {
                       Endereço
                     </h3>
                     <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-[#3358A5] mb-1 text-xs block">
-                          CEP
-                        </Label>
-                        <Input
-                          value={step2Data.cep}
-                          onChange={(e) =>
-                            handleStep2Change("cep", e.target.value)
-                          }
-                          className={`bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
-                            step2Errors.cep
-                              ? "border-2 border-red-500 focus-visible:ring-red-500"
-                              : "border border-gray-300"
-                          }`}
-                          placeholder="00000-000"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-[#3358A5] mb-1 text-xs block">
-                          Nome da rua
-                        </Label>
-                        <Input
-                          value={step2Data.rua}
-                          onChange={(e) =>
-                            handleStep2Change("rua", e.target.value)
-                          }
-                          className={`bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
-                            step2Errors.rua
-                              ? "border-2 border-red-500 focus-visible:ring-red-500"
-                              : "border border-gray-300"
-                          }`}
-                          placeholder="Rua exemplo"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-[#3358A5] mb-1 text-xs block">
-                          Número
-                        </Label>
-                        <Input
-                          value={step2Data.numero}
-                          onChange={(e) =>
-                            handleStep2Change("numero", e.target.value)
-                          }
-                          className={`bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
-                            step2Errors.numero
-                              ? "border-2 border-red-500 focus-visible:ring-red-500"
-                              : "border border-gray-300"
-                          }`}
-                          placeholder="123"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-[#3358A5] mb-1 text-xs block">
-                          Bairro
-                        </Label>
-                        <Input
-                          value={step2Data.bairro}
-                          onChange={(e) =>
-                            handleStep2Change("bairro", e.target.value)
-                          }
-                          className={`bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
-                            step2Errors.bairro
-                              ? "border-2 border-red-500 focus-visible:ring-red-500"
-                              : "border border-gray-300"
-                          }`}
-                          placeholder="Centro"
-                        />
-                      </div>
+                      {(
+                        [
+                          {
+                            key: "cep",
+                            label: "CEP",
+                            placeholder: "00000-000",
+                          },
+                          {
+                            key: "rua",
+                            label: "Nome da rua",
+                            placeholder: "Rua exemplo",
+                          },
+                          {
+                            key: "numero",
+                            label: "Número",
+                            placeholder: "123",
+                          },
+                          {
+                            key: "bairro",
+                            label: "Bairro",
+                            placeholder: "Centro",
+                          },
+                        ] as const
+                      ).map(({ key, label, placeholder }) => (
+                        <div key={key}>
+                          <Label className="text-[#3358A5] mb-1 text-xs block">
+                            {label}
+                          </Label>
+                          <Input
+                            value={step2Data[key]}
+                            onChange={(e) =>
+                              handleStep2Change(key, e.target.value)
+                            }
+                            className={inputClass(step2Errors[key])}
+                            placeholder={placeholder}
+                          />
+                        </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -559,47 +581,41 @@ export default function SignUpPage() {
                       Presença Digital
                     </h3>
                     <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-[#3358A5] mb-1 text-xs block">
-                          Redes Sociais
-                        </Label>
-                        <Input
-                          value={step2Data.redesSociais}
-                          onChange={(e) =>
-                            handleStep2Change("redesSociais", e.target.value)
-                          }
-                          className={`bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
-                            step2Errors.redesSociais
-                              ? "border-2 border-red-500 focus-visible:ring-red-500"
-                              : "border border-gray-300"
-                          }`}
-                          placeholder="@loja"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-[#3358A5] mb-1 text-xs block">
-                          Site loja
-                        </Label>
-                        <Input
-                          value={step2Data.siteLoja}
-                          onChange={(e) =>
-                            handleStep2Change("siteLoja", e.target.value)
-                          }
-                          className={`bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
-                            step2Errors.siteLoja
-                              ? "border-2 border-red-500 focus-visible:ring-red-500"
-                              : "border border-gray-300"
-                          }`}
-                          placeholder="www.loja.com.br"
-                        />
-                      </div>
+                      {(
+                        [
+                          {
+                            key: "redesSociais",
+                            label: "Redes Sociais",
+                            placeholder: "@loja",
+                          },
+                          {
+                            key: "siteLoja",
+                            label: "Site loja",
+                            placeholder: "www.loja.com.br",
+                          },
+                        ] as const
+                      ).map(({ key, label, placeholder }) => (
+                        <div key={key}>
+                          <Label className="text-[#3358A5] mb-1 text-xs block">
+                            {label}
+                          </Label>
+                          <Input
+                            value={step2Data[key]}
+                            onChange={(e) =>
+                              handleStep2Change(key, e.target.value)
+                            }
+                            className={inputClass(step2Errors[key])}
+                            placeholder={placeholder}
+                          />
+                        </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
               </div>
             )}
 
-            {/* STEP 3 - Serviços */}
+            {/* STEP 3 — Serviços */}
             {step === 3 && (
               <div className="w-full space-y-6">
                 <div>
@@ -607,32 +623,14 @@ export default function SignUpPage() {
                     Serviços prestados
                   </Label>
                   <div className="grid grid-cols-3 gap-3">
-                    {[
-                      "Óleo motor",
-                      "Óleo de freio",
-                      "Filtro cabine",
-                      "Óleo de câmbio manual",
-                      "Óleo de Direção",
-                      "Outros serviços",
-                      "Óleo de câmbio automático parcial",
-                      "Limpeza arrefecimento",
-                      "Filtro de óleo",
-                      "Óleo de câmbio automático comple.",
-                      "Filtro de Ar",
-                      "Filtro de combus",
-                    ].map((servico) => {
-                      const isSelected =
-                        step3Data.servicosSelecionados.includes(servico);
+                    {SERVICOS.map((servico) => {
+                      const isSelected = servicosSelecionados.includes(servico);
                       return (
                         <button
                           key={servico}
                           type="button"
                           onClick={() => toggleServico(servico)}
-                          className={`relative flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all border ${
-                            isSelected
-                              ? "bg-white border-gray-300 text-gray-700"
-                              : "bg-white border-gray-300 text-gray-400"
-                          }`}
+                          className="relative flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all border bg-white border-gray-300 text-gray-700"
                         >
                           <span className="text-left flex-1 pr-2">
                             {servico}
@@ -672,7 +670,7 @@ export default function SignUpPage() {
               </div>
             )}
 
-            {/* STEP 4 - Dias e Horários */}
+            {/* STEP 4 — Dias e Horários */}
             {step === 4 && (
               <div className="w-full space-y-6">
                 <div>
@@ -680,7 +678,7 @@ export default function SignUpPage() {
                     Dias / Horários
                   </Label>
                   <div className="space-y-2">
-                    {step3Data.horarios.map((horario, index) => (
+                    {horarios.map((horario, index) => (
                       <div
                         key={index}
                         className="flex items-center gap-4 bg-white rounded-lg px-4 py-3 border border-gray-300"
@@ -713,43 +711,37 @@ export default function SignUpPage() {
                         </button>
 
                         <div className="flex items-center gap-2">
-                          <select
-                            value={horario.inicio}
-                            onChange={(e) =>
-                              updateHorarioDia(index, "inicio", e.target.value)
-                            }
-                            disabled={!horario.ativo}
-                            className={`px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                              !horario.ativo
-                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                : "bg-white text-gray-700"
-                            }`}
-                          >
-                            {horariosDisponiveis.map((h) => (
-                              <option key={h} value={h}>
-                                {h}
-                              </option>
-                            ))}
-                          </select>
-                          <span className="text-sm text-gray-500">às</span>
-                          <select
-                            value={horario.fim}
-                            onChange={(e) =>
-                              updateHorarioDia(index, "fim", e.target.value)
-                            }
-                            disabled={!horario.ativo}
-                            className={`px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                              !horario.ativo
-                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                : "bg-white text-gray-700"
-                            }`}
-                          >
-                            {horariosDisponiveis.map((h) => (
-                              <option key={h} value={h}>
-                                {h}
-                              </option>
-                            ))}
-                          </select>
+                          {(["inicio", "fim"] as const).map((field, fi) => (
+                            <>
+                              {fi === 1 && (
+                                <span
+                                  key="sep"
+                                  className="text-sm text-gray-500"
+                                >
+                                  às
+                                </span>
+                              )}
+                              <select
+                                key={field}
+                                value={horario[field]}
+                                onChange={(e) =>
+                                  updateHorarioDia(index, field, e.target.value)
+                                }
+                                disabled={!horario.ativo}
+                                className={`px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                                  !horario.ativo
+                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                    : "bg-white text-gray-700"
+                                }`}
+                              >
+                                {horariosDisponiveis.map((h) => (
+                                  <option key={h} value={h}>
+                                    {h}
+                                  </option>
+                                ))}
+                              </select>
+                            </>
+                          ))}
                         </div>
                       </div>
                     ))}
@@ -758,7 +750,7 @@ export default function SignUpPage() {
               </div>
             )}
 
-            {/* STEP 5 - Termos de Uso */}
+            {/* STEP 5 — Termos de Uso */}
             {step === 5 && (
               <Card className="bg-transparent border-none shadow-none w-full">
                 <Label className="text-[#3358A5] mb-3 block text-base font-semibold">
@@ -768,7 +760,6 @@ export default function SignUpPage() {
                   <div className="bg-white rounded-lg shadow-inner p-4 h-[400px] overflow-y-auto border border-gray-200">
                     <TermsOfUse />
                   </div>
-
                   <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
@@ -790,6 +781,7 @@ export default function SignUpPage() {
           </div>
         </div>
 
+        {/* FOOTER BUTTONS */}
         <div className="flex-shrink-0 border-gray-300 bg-[#E5E5E5] py-12">
           <div className="w-full max-w-[600px] mx-auto px-4 flex justify-between">
             <Button
@@ -799,7 +791,7 @@ export default function SignUpPage() {
               Voltar
             </Button>
 
-            {step < steps.length ? (
+            {step < STEPS.length ? (
               <Button
                 onClick={handleAdvance}
                 className="bg-green-500 hover:bg-green-600 text-white px-8 py-2"
@@ -818,11 +810,18 @@ export default function SignUpPage() {
         </div>
       </main>
 
+      {/* MODALS */}
       <ErrorModal
-        open={modalState.open}
-        onOpenChange={(open) => setModalState({ ...modalState, open })}
-        title={modalState.title}
-        message={modalState.message}
+        open={errorModal.open}
+        onOpenChange={(open) => setErrorModal({ ...errorModal, open })}
+        title={errorModal.title}
+        message={errorModal.message}
+      />
+
+      <SuccessModal
+        open={successModal}
+        redirectSeconds={4}
+        onRedirect={() => navigate("/sign-in")}
       />
     </div>
   );

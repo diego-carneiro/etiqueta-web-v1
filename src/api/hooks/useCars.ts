@@ -4,7 +4,7 @@ import {
   getVehicleById,
   getVehicleByPlate,
   VehicleParams,
-} from "@/services/carsService";
+} from "../services/carsService";
 
 export const useCreateVehicle = () =>
   useMutation({

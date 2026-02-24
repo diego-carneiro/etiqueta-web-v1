@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getCustomerData, getCustomerById } from "@/services/customerService";
+import { getCustomerData, getCustomerById } from "../services/customerService";
 
 export const useCustomer = () =>
   useQuery({

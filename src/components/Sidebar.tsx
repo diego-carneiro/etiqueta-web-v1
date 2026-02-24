@@ -11,22 +11,18 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useBasePath } from "@/hooks/useBasePath";
 
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isAdminDropdownOpen, setIsAdminDropdownOpen] = useState(false);
-  const basePath = useBasePath();
+
+  const isAdmin = location.pathname.startsWith("/admin");
+  const basePath = isAdmin ? "/admin/app" : "/app";
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("user");
-    navigate("/sign-in");
+    navigate(isAdmin ? "/admin/sign-in" : "/sign-in");
   };
-
-  const isAdmin = basePath.includes("/admin");
 
   const baseMenuItems = [
     { label: "Dashboard", icon: Home, path: `${basePath}/dashboard` },

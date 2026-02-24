@@ -24,7 +24,7 @@ import AddLabel from "@/pages/AddLabel";
 // ---------------- ADMIN ----------------
 import AdminSignInPage from "@/pages/admin/AdminSignInPage";
 import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
-import AdminServiceCentersPage from "@/pages/admin/AdminServiceCentersPage";
+import AdminCompaniesPage from "@/pages/admin/AdminCompaniesPage";
 import AdminFinancesPage from "@/pages/admin/AdminFinancesPage";
 import AdminClientsPage from "@/pages/admin/AdminClientsPage";
 import AdminEmployeesPage from "@/pages/admin/AdminEmployeesPage";
@@ -72,7 +72,7 @@ export const Router = createBrowserRouter([
         element: <MainLayout />,
         children: [
           { path: "dashboard", element: <AdminDashboardPage /> },
-          { path: "service-centers", element: <AdminServiceCentersPage /> },
+          { path: "service-centers", element: <AdminCompaniesPage /> },
           { path: "finances", element: <AdminFinancesPage /> },
           { path: "clients", element: <AdminClientsPage /> },
           { path: "employees", element: <AdminEmployeesPage /> },

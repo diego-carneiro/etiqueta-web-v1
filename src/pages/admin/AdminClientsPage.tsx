@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -10,76 +10,51 @@ import {
 } from "@/components/ui/table";
 import { UsersRound } from "lucide-react";
 
+import { getCustomerData } from "@/api/services/customerService";
+
+interface Client {
+  id: string;
+  name: string;
+  mainCar: string;
+  plate: string;
+  status: string;
+  store: string;
+}
+
 export default function AdminClientsPage() {
-  const registeredClients = [
-    {
-      id: "46512354",
-      name: "Yanka Fernandes",
-      mainCar: "HB20 2023",
-      plate: "TYU5G56",
-      status: "Pendente",
-      store: "**************",
-    },
-    {
-      id: "46512354",
-      name: "Daise Lima da siva Rodrigu",
-      mainCar: "ARGO 2025",
-      plate: "RVB2E03",
-      status: "Verificado",
-      store: "Rei do óleo Taip...",
-    },
-    {
-      id: "46512354",
-      name: "Felipe Alves",
-      mainCar: "CRV 2019",
-      plate: "CRT 2556",
-      status: "Verificado",
-      store: "Max lub",
-    },
-    {
-      id: "46512354",
-      name: "João Pedro Henrique",
-      mainCar: "COROLLA 1999",
-      plate: "JKW 2623",
-      status: "Verificado",
-      store: "Max Lub",
-    },
-    {
-      id: "46512354",
-      name: "Sonia Pereira",
-      mainCar: "FUSCA 88",
-      plate: "KKL 1356",
-      status: "Verificado",
-      store: "General do óleo",
-    },
-    {
-      id: "46512354",
-      name: "Carlos Souza Rosa",
-      mainCar: "C300",
-      plate: "EVL8B62",
-      status: "Verificado",
-      store: "Mercado car barra f",
-    },
-  ];
-
-  const pendingClients = [
-    {
-      id: "998877",
-      name: "Cliente Novo",
-      mainCar: "HB20S 2020",
-      plate: "ABC1234",
-      status: "Pendente",
-      store: "-",
-    },
-  ];
-
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [view, setView] = useState<"registered" | "pending">("registered");
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        setLoading(true);
+        const data = await getCustomerData();
+        setClients(data);
+      } catch (error) {
+        console.error("Erro ao carregar os clientes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClients();
+  }, []);
+
+  const registeredClients = clients.filter(
+    (client) => client.status === "Verificado", // Ajuste a string conforme o padrão da API
+  );
+
+  const pendingClients = clients.filter(
+    (client) => client.status === "Pendente", // Ajuste a string conforme o padrão da API
+  );
+
   const currentClients =
     view === "registered" ? registeredClients : pendingClients;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F5F5F5] p-12 overflow-hidden gap-10">
-      {/* CARDS SUPERIORES */}
       <div className="flex justify-start gap-6">
         <Card
           onClick={() => setView("registered")}
@@ -93,7 +68,7 @@ export default function AdminClientsPage() {
             </div>
             <div>
               <p className="text-lg font-bold text-gray-800">
-                {registeredClients.length}
+                {loading ? "..." : registeredClients.length}
               </p>
               <p className="text-sm text-gray-500">Clientes cadastrados</p>
             </div>
@@ -112,14 +87,13 @@ export default function AdminClientsPage() {
             </div>
             <div>
               <p className="text-lg font-bold text-gray-800">
-                {pendingClients.length}
+                {loading ? "..." : pendingClients.length}
               </p>
               <p className="text-sm text-gray-500">Clientes pendentes</p>
             </div>
           </CardContent>
         </Card>
 
-        {/* FILTROS / BUSCAS — alinhados à direita exatamente como Finances */}
         <div className="flex flex-col ml-auto">
           <label className="text-sm font-medium text-gray-700 mb-1">
             Buscar cliente
@@ -133,7 +107,6 @@ export default function AdminClientsPage() {
         </div>
       </div>
 
-      {/* TABELA */}
       <div className="flex-1 flex flex-col bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6">
           <Table className="w-full">
@@ -161,36 +134,53 @@ export default function AdminClientsPage() {
             </TableHeader>
 
             <TableBody>
-              {currentClients.map((client) => (
-                <TableRow
-                  key={client.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                >
-                  <TableCell className="py-3">{client.id}</TableCell>
-                  <TableCell className="py-3">{client.name}</TableCell>
-                  <TableCell className="py-3">{client.mainCar}</TableCell>
-                  <TableCell className="py-3">{client.plate}</TableCell>
-
-                  <TableCell className="py-3">
-                    <span
-                      className={`text-xs font-medium px-3 py-1 rounded-full ${
-                        client.status === "Verificado"
-                          ? "bg-green-50 text-green-600"
-                          : "bg-yellow-50 text-yellow-600"
-                      }`}
-                    >
-                      {client.status}
-                    </span>
+              {loading ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    className="text-center py-6 text-gray-500"
+                  >
+                    Carregando clientes...
                   </TableCell>
-
-                  <TableCell className="py-3">{client.store}</TableCell>
                 </TableRow>
-              ))}
+              ) : currentClients.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    className="text-center py-6 text-gray-500"
+                  >
+                    Nenhum cliente encontrado.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                currentClients.map((client) => (
+                  <TableRow
+                    key={client.id}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
+                    <TableCell className="py-3">{client.id}</TableCell>
+                    <TableCell className="py-3">{client.name}</TableCell>
+                    <TableCell className="py-3">{client.mainCar}</TableCell>
+                    <TableCell className="py-3">{client.plate}</TableCell>
+                    <TableCell className="py-3">
+                      <span
+                        className={`text-xs font-medium px-3 py-1 rounded-full ${
+                          client.status === "Verificado"
+                            ? "bg-green-50 text-green-600"
+                            : "bg-yellow-50 text-yellow-600"
+                        }`}
+                      >
+                        {client.status}
+                      </span>
+                    </TableCell>
+                    <TableCell className="py-3">{client.store}</TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
 
-        {/* PAGINAÇÃO */}
         <div className="flex justify-end items-center h-12 px-6 border-t border-gray-100 text-sm text-gray-500 space-x-2">
           <span className="cursor-pointer hover:text-gray-800">1</span>
           <span className="cursor-pointer hover:text-gray-800">2</span>

@@ -5,7 +5,7 @@ import {
   getLabelsHistoryByEmployeeId,
   getLabelsHistory,
   CreateLabelParams,
-} from "@/services/labelsService";
+} from "../services/labelsService";
 
 export const useCreateLabel = () =>
   useMutation({

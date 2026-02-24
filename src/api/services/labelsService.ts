@@ -1,4 +1,4 @@
-import api from "../api/axios";
+import api from "../axios";
 
 export interface Label {
   id: string;
@@ -60,21 +60,21 @@ export interface LabelsHistoryResponse {
 }
 
 export const createLabel = async (
-  params: CreateLabelParams
+  params: CreateLabelParams,
 ): Promise<Label> => {
   const response = await api.post("/labels", params);
   return response.data;
 };
 
 export const getLabelsByVehicleId = async (
-  vehicleId: string
+  vehicleId: string,
 ): Promise<Label[]> => {
   const response = await api.get(`/labels/${vehicleId}`);
   return response.data;
 };
 
 export const getLabelsHistoryByEmployeeId = async (
-  employeeId: string
+  employeeId: string,
 ): Promise<LabelsHistoryRecord[]> => {
   const response = await api.get(`/labels/history/${employeeId}`);
   return response.data;

@@ -5,7 +5,7 @@ import {
   updateEmployee,
   deleteEmployee,
   CreateEmployeeDTO,
-} from "@/services/employeeService";
+} from "../services/employeeService";
 
 export type Employee = {
   id: string;

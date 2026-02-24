@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,15 +13,13 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { X, Eye, EyeOff } from "lucide-react";
-import { useEmployeeLogin, useAdminLogin } from "@/api/hooks/loginAuth";
+import { useCompanyLogin, useAdminLogin } from "@/api/hooks/useLoginAuth";
 
 type Props = {
   selector: "sign-in" | "recoverPassword" | "recoverCode" | "redefinePassword";
-  setRecoverStage?: (stage: string) => void;
-  userType?: "employee" | "admin";
 };
 
-export default function UserForms({ selector, userType = "employee" }: Props) {
+export default function UserForms({ selector }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -31,26 +29,23 @@ export default function UserForms({ selector, userType = "employee" }: Props) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const isAdmin = pathname.startsWith("/admin");
 
   const adminLogin = useAdminLogin();
-  const employeeLogin = useEmployeeLogin();
-  const loginMutation = userType === "admin" ? adminLogin : employeeLogin;
+  const companyLogin = useCompanyLogin();
+  const loginMutation = isAdmin ? adminLogin : companyLogin;
 
   const handleLogin = () => {
     loginMutation.mutate(
       { email, password },
       {
         onSuccess: (data) => {
-          localStorage.setItem(
-            userType === "admin" ? "adminToken" : "token",
-            data.token
-          );
-          navigate(
-            userType === "admin" ? "/admin/app/dashboard" : "/app/dashboard"
-          );
+          navigate(isAdmin ? "/admin/app/dashboard" : "/app/dashboard");
         },
         onError: () => setIsErrorDialogOpen(true),
-      }
+      },
     );
   };
 
@@ -66,7 +61,11 @@ export default function UserForms({ selector, userType = "employee" }: Props) {
         {selector === "sign-in" && (
           <Card className="bg-transparent border-none shadow-none">
             <CardContent className="flex flex-col gap-4 p-0">
-            <p className="text-white mt-30 mb-6 text-center text-lg font-bold">Entre com sua conta de funcionário</p>
+              <p className="text-white mt-30 mb-6 text-center text-lg font-bold">
+                {isAdmin
+                  ? "Entre com sua conta de administrador"
+                  : "Acesse sua loja"}
+              </p>
               <div>
                 <Label htmlFor="email" className="text-white mb-2">
                   Email
@@ -112,7 +111,7 @@ export default function UserForms({ selector, userType = "employee" }: Props) {
                 {loginMutation.isPending ? "Entrando..." : "Entrar"}
               </Button>
 
-              {userType === "employee" && (
+              {!isAdmin && (
                 <Button
                   onClick={() => navigate("/sign-up")}
                   className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full"

@@ -8,7 +8,7 @@ export default function AdminSignInPage() {
       </div>
 
       <div className="w-full lg:w-1/3">
-        <UserForms selector="sign-in" userType="admin" />
+        <UserForms selector="sign-in" />
       </div>
     </div>
   );

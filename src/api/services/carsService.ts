@@ -1,4 +1,4 @@
-import api from "@/api/axios";
+import api from "../axios";
 
 export type VehicleParams = {
   licensePlate: string;
@@ -31,7 +31,7 @@ export const getVehicleById = async (vehicleId: string): Promise<Vehicle> => {
 };
 
 export const getVehicleByPlate = async (
-  licensePlate: string
+  licensePlate: string,
 ): Promise<Vehicle> => {
   const response = await api.get(`/vehicles/${licensePlate}`);
   console.log(response.data);

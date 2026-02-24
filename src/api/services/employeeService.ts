@@ -1,4 +1,4 @@
-import api from "../api/axios";
+import api from "../axios";
 import { PaginatedEmployeeResponse } from "@/api/hooks/useEmployee";
 
 export interface CreateEmployeeDTO {
@@ -10,19 +10,21 @@ export interface CreateEmployeeDTO {
 }
 
 export const createEmployee = async (
-  employee: CreateEmployeeDTO
+  employee: CreateEmployeeDTO,
 ): Promise<void> => {
   await api.post("/employees", employee);
 };
 
 export const getEmployees = async (): Promise<PaginatedEmployeeResponse> => {
   const response = await api.get("/employees");
+  console.log(response.data, "CU");
+
   return response.data;
 };
 
 export const updateEmployee = async (
   employeeId: string,
-  data: Partial<CreateEmployeeDTO>
+  data: Partial<CreateEmployeeDTO>,
 ): Promise<void> => {
   await api.put(`/employees/${employeeId}`, data);
 };
