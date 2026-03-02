@@ -82,7 +82,7 @@ export const getLabelsHistoryByEmployeeId = async (
 
 export const getLabelsHistory = async (): Promise<LabelsHistoryRecord[]> => {
   const response = await api.get("/labels/history");
-  console.log(response.data);
+  console.log(response, "cu");
 
   return response.data.data;
 };

@@ -17,7 +17,6 @@ export default function EmployeeRegister() {
     email: "",
     password: "",
     taxId: "",
-    serviceCenterId: "",
   });
 
   const [showErrorDialog, setShowErrorDialog] = useState(false);
@@ -32,35 +31,27 @@ export default function EmployeeRegister() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutate(formData, {
-      onSuccess: () => {
-        setFormData({
-          name: "",
-          email: "",
-          password: "",
-          taxId: "",
-          serviceCenterId: "",
-        });
-        navigate("/app/employees");
+    const companyId = localStorage.getItem("companyId") ?? "";
+    mutate(
+      { ...formData, companyId },
+      {
+        onSuccess: () => {
+          setFormData({ name: "", email: "", password: "", taxId: "" });
+          navigate("/app/employees");
+        },
+        onError: () => {
+          setShowErrorDialog(true);
+          setFormData({ name: "", email: "", password: "", taxId: "" });
+        },
       },
-      onError: () => {
-        setShowErrorDialog(true);
-        setFormData({
-          name: "",
-          email: "",
-          password: "",
-          taxId: "",
-          serviceCenterId: "",
-        });
-      },
-    });
+    );
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 px-8 mt-16">
+    <div className="min-h-screen bg-gray-300 px-8 flex items-center">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-4 max-w-100 mx-auto mt-30"
+        className="flex flex-col gap-4 w-100 mx-auto"
       >
         <div className="flex flex-col space-y-1">
           <label className="text-sm font-medium text-gray-700">Nome</label>
@@ -69,6 +60,17 @@ export default function EmployeeRegister() {
             value={formData.name}
             onChange={handleChange}
             placeholder="Digite um nome"
+            className="bg-white border-none shadow-sm"
+          />
+        </div>
+
+        <div className="flex flex-col space-y-1">
+          <label className="text-sm font-medium text-gray-700">CPF</label>
+          <Input
+            name="taxId"
+            value={formData.taxId}
+            onChange={handleChange}
+            placeholder="000.000.000-00"
             className="bg-white border-none shadow-sm"
           />
         </div>
@@ -93,30 +95,6 @@ export default function EmployeeRegister() {
             value={formData.password}
             onChange={handleChange}
             placeholder="Sua senha"
-            className="bg-white border-none shadow-sm"
-          />
-        </div>
-
-        <div className="flex flex-col space-y-1 mt-16">
-          <label className="text-sm font-medium text-gray-700">CPF</label>
-          <Input
-            name="taxId"
-            value={formData.taxId}
-            onChange={handleChange}
-            placeholder="000.000.000-00"
-            className="bg-white border-none shadow-sm"
-          />
-        </div>
-
-        <div className="flex flex-col space-y-1">
-          <label className="text-sm font-medium text-gray-700">
-            Código da Loja
-          </label>
-          <Input
-            name="serviceCenterId"
-            value={formData.serviceCenterId}
-            onChange={handleChange}
-            placeholder="Digite o código da loja"
             className="bg-white border-none shadow-sm"
           />
         </div>

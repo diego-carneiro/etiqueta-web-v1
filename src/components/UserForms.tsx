@@ -15,6 +15,17 @@ import {
 import { X, Eye, EyeOff } from "lucide-react";
 import { useCompanyLogin, useAdminLogin } from "@/api/hooks/useLoginAuth";
 
+type LoginResponse = {
+  id: string;
+  username: string;
+  email: string;
+  token: string;
+  sessionTimeout: number;
+  isActive: boolean;
+  approvalStatus: number;
+  approvalStatusDescription: string;
+};
+
 type Props = {
   selector: "sign-in" | "recoverPassword" | "recoverCode" | "redefinePassword";
 };
@@ -41,7 +52,10 @@ export default function UserForms({ selector }: Props) {
     loginMutation.mutate(
       { email, password },
       {
-        onSuccess: (data) => {
+        onSuccess: (data: LoginResponse) => {
+          if (!isAdmin && data?.id) {
+            localStorage.setItem("companyId", data.id);
+          }
           navigate(isAdmin ? "/admin/app/dashboard" : "/app/dashboard");
         },
         onError: () => setIsErrorDialogOpen(true),

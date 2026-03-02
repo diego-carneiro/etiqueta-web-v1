@@ -49,7 +49,7 @@ export const Router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <DashboardPage /> },
           { path: "user-infos", element: <UserInfos /> },
-          { path: "client", element: <ClientPage /> },
+          { path: "clients", element: <ClientPage /> },
           { path: "add-label", element: <AddLabel /> },
           { path: "payments", element: <PaymentsPage /> },
           { path: "employees", element: <EmployeesPage /> },
@@ -72,7 +72,7 @@ export const Router = createBrowserRouter([
         element: <MainLayout />,
         children: [
           { path: "dashboard", element: <AdminDashboardPage /> },
-          { path: "service-centers", element: <AdminCompaniesPage /> },
+          { path: "companies", element: <AdminCompaniesPage /> },
           { path: "finances", element: <AdminFinancesPage /> },
           { path: "clients", element: <AdminClientsPage /> },
           { path: "employees", element: <AdminEmployeesPage /> },

@@ -20,7 +20,12 @@ export default function Sidebar() {
   const isAdmin = location.pathname.startsWith("/admin");
   const basePath = isAdmin ? "/admin/app" : "/app";
 
+  const clearAuthStorage = () => {
+    localStorage.removeItem("token");
+  };
+
   const handleLogout = () => {
+    clearAuthStorage();
     navigate(isAdmin ? "/admin/sign-in" : "/sign-in");
   };
 
@@ -39,7 +44,7 @@ export default function Sidebar() {
         {
           label: "Lojas",
           icon: Building2,
-          path: `${basePath}/service-centers`,
+          path: `${basePath}/companies`,
         },
         { label: "Financeiro", icon: Wallet, path: `${basePath}/finances` },
       ],

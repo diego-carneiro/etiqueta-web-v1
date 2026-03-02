@@ -31,8 +31,8 @@ export default function ClientPage() {
   }, [vehicleData]);
 
   const validatePlate = (plate: string): boolean => {
-    const regexOld = /^[A-Z]{3}[0-9]{4}$/; // ABC1234
-    const regexMercosul = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/; // ABC1D23
+    const regexOld = /^[A-Z]{3}[0-9]{4}$/;
+    const regexMercosul = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
     return regexOld.test(plate) || regexMercosul.test(plate);
   };
 
@@ -41,7 +41,7 @@ export default function ClientPage() {
 
     if (!validatePlate(licensePlate)) {
       setValidationError(
-        "Formato de placa inválido. Use ABC1234 ou ABC1D23 (Mercosul)."
+        "Formato de placa inválido. Use ABC1234 ou ABC1D23 (Mercosul).",
       );
       return;
     }
@@ -85,29 +85,31 @@ export default function ClientPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-6">
-      <div className="flex-col items-center max-w-md">
-        <div className="flex items-center w-80 bg-white rounded-xl px-3 py-2 mb-2 shadow">
-          <Search size={18} className="text-gray-400" />
-          <input
-            type="text"
-            placeholder="Buscar cliente por placa"
-            value={licensePlate}
-            onChange={(e) => setLicensePlate(e.target.value.toUpperCase())}
-            onKeyDown={handleKeyDown}
-            className="flex-1 ml-2 bg-transparent text-base text-gray-800 outline-none"
-          />
+      <div className="flex flex-col items-center max-w-lg">
+        <div className="flex flex-col items-center bg-[#004AAD] backdrop-blur-sm border border-gray-200 rounded-2xl px-8 py-6 shadow-md">
+          <div className="flex items-center w-96 bg-white rounded-xl px-4 py-3 mb-1 shadow-md">
+            <Search size={20} className="text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar cliente por placa"
+              value={licensePlate}
+              onChange={(e) => setLicensePlate(e.target.value.toUpperCase())}
+              onKeyDown={handleKeyDown}
+              className="flex-1 ml-3 bg-transparent text-base text-gray-800 outline-none"
+            />
+          </div>{" "}
+          <div className="h-6 mt-1">
+            {validationError && (
+              <p className="text-red-500 text-sm">{validationError}</p>
+            )}
+          </div>
+          <button
+            onClick={handleSearch}
+            className="w-96 bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg mt-4 text-white font-semibold transition-colors"
+          >
+            Pesquisar
+          </button>
         </div>
-
-        {validationError && (
-          <p className="text-red-500 text-sm mb-2">{validationError}</p>
-        )}
-
-        <button
-          onClick={handleSearch}
-          className="w-80 bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg mt-2 text-white font-semibold transition-colors"
-        >
-          Pesquisar
-        </button>
       </div>
 
       <Dialog open={showLoading} onOpenChange={setShowLoading}>
@@ -167,7 +169,7 @@ export default function ClientPage() {
           {vehicleData && customerData && (
             <div className="mt-4 text-gray-800 space-y-2">
               <p>
-                <span className="font-bold">Proprietário:</span>{" "}
+                <span className="font-bold">Proprietário:</span>
                 {customerData.name || "-"}
               </p>
               <p>
@@ -175,7 +177,7 @@ export default function ClientPage() {
                 {vehicleData.licensePlate || "-"}
               </p>
               <p>
-                <span className="font-bold">Modelo:</span> {vehicleData.brand}{" "}
+                <span className="font-bold">Modelo:</span> {vehicleData.brand}
                 {vehicleData.model}
               </p>
               <p>
@@ -183,7 +185,7 @@ export default function ClientPage() {
                 {vehicleData.year || "-"}
               </p>
               <p>
-                <span className="font-bold">Km da última troca:</span>{" "}
+                <span className="font-bold">Km da última troca:</span>
                 {vehicleData.currentMileage || "-"}Km
               </p>
               <div className="flex justify-center">

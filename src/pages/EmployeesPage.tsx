@@ -30,7 +30,7 @@ export default function EmployeesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editStep, setEditStep] = useState<"choose" | "email" | "password">(
-    "choose"
+    "choose",
   );
   const [selectedEmployee, setSelectedEmployee] = useState<{
     id: string;
@@ -79,7 +79,7 @@ export default function EmployeesPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-800">
-                {data?.data.length ?? 0}
+                {data?.data?.length ?? 0}
               </p>
               <p className="text-sm text-gray-500">Funcionários</p>
             </div>
@@ -122,7 +122,7 @@ export default function EmployeesPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              data?.data.map(
+              data?.data?.map(
                 (employee: { id: string; name: string; email: string }) => (
                   <TableRow
                     key={employee.id}
@@ -155,7 +155,7 @@ export default function EmployeesPage() {
                       </Button>
                     </TableCell>
                   </TableRow>
-                )
+                ),
               )
             )}
           </TableBody>

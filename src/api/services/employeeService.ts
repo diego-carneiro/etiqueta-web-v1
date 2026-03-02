@@ -6,7 +6,7 @@ export interface CreateEmployeeDTO {
   email: string;
   password: string;
   taxId: string;
-  serviceCenterId: string;
+  companyId: string;
 }
 
 export const createEmployee = async (
@@ -17,8 +17,6 @@ export const createEmployee = async (
 
 export const getEmployees = async (): Promise<PaginatedEmployeeResponse> => {
   const response = await api.get("/employees");
-  console.log(response.data, "CU");
-
   return response.data;
 };
 
