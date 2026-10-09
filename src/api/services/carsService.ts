@@ -11,6 +11,7 @@ export type VehicleParams = {
 
 export type Vehicle = {
   id: string;
+  customerId?: string;
   licensePlate: string;
   brand: string;
   model: string;

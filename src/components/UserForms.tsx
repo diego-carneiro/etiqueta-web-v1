@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { EmailInput } from "@/components/ui/input/email-input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { X, Eye, EyeOff } from "lucide-react";
 import { useCompanyLogin, useAdminLogin } from "@/api/hooks/useLoginAuth";
+import WaitingApproval from "./WaitingApproval";
 
 type LoginResponse = {
   id: string;
@@ -26,11 +28,19 @@ type LoginResponse = {
   approvalStatusDescription: string;
 };
 
-type Props = {
+type UserFormsProps = {
   selector: "sign-in" | "recoverPassword" | "recoverCode" | "redefinePassword";
+  onWaitingApproval?: () => void;
 };
 
-export default function UserForms({ selector }: Props) {
+export default function UserForms({
+  selector,
+  onWaitingApproval,
+}: UserFormsProps) {
+  const inputBaseClassName =
+    "bg-white text-gray-800 placeholder:text-gray-500 border-none focus:ring-2 focus:ring-gray-200 focus:outline-none";
+  const iconInputClassName = `${inputBaseClassName} pr-10`;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -38,6 +48,8 @@ export default function UserForms({ selector }: Props) {
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isWaitingApproval, setIsWaitingApproval] = useState(false);
+  const [isEmailValid, setIsEmailValid] = useState(true);
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -48,14 +60,31 @@ export default function UserForms({ selector }: Props) {
   const companyLogin = useCompanyLogin();
   const loginMutation = isAdmin ? adminLogin : companyLogin;
 
+  if (isWaitingApproval) {
+    return <WaitingApproval onBack={() => setIsWaitingApproval(false)} />;
+  }
+
   const handleLogin = () => {
+    if (!email.trim() || !isEmailValid) {
+      return;
+    }
+
     loginMutation.mutate(
       { email, password },
       {
         onSuccess: (data: LoginResponse) => {
+          if (
+            data?.approvalStatus === 0 &&
+            data?.approvalStatusDescription === "WaitingApproval"
+          ) {
+            onWaitingApproval?.();
+            return;
+          }
+
           if (!isAdmin && data?.id) {
             localStorage.setItem("companyId", data.id);
           }
+
           navigate(isAdmin ? "/admin/app/dashboard" : "/app/dashboard");
         },
         onError: () => setIsErrorDialogOpen(true),
@@ -84,13 +113,13 @@ export default function UserForms({ selector }: Props) {
                 <Label htmlFor="email" className="text-white mb-2">
                   Email
                 </Label>
-                <Input
-                  id="email"
-                  type="email"
+                <EmailInput
                   placeholder="Digite seu email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-white text-gray-800 placeholder:text-gray-500"
+                  onChange={setEmail}
+                  onValidityChange={setIsEmailValid}
+                  className={`${inputBaseClassName} mt-0`}
+                  required
                 />
               </div>
 
@@ -105,7 +134,7 @@ export default function UserForms({ selector }: Props) {
                     placeholder="Digite sua senha"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-white text-gray-800 placeholder:text-gray-500 pr-10"
+                    className={iconInputClassName}
                   />
                   <button
                     type="button"
@@ -156,17 +185,23 @@ export default function UserForms({ selector }: Props) {
                 <Label htmlFor="email" className="text-white mb-2">
                   Email
                 </Label>
-                <Input
-                  id="email"
-                  type="email"
+                <EmailInput
                   placeholder="Digite seu email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-white text-gray-800 placeholder:text-gray-500"
+                  onChange={setEmail}
+                  onValidityChange={setIsEmailValid}
+                  className={`${inputBaseClassName} mt-0`}
+                  required
                 />
               </div>
               <Button
-                onClick={() => navigate("/recover-code")}
+                onClick={() => {
+                  if (!email.trim() || !isEmailValid) {
+                    return;
+                  }
+
+                  navigate("/recover-code");
+                }}
                 className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full"
               >
                 Recuperar
@@ -191,7 +226,7 @@ export default function UserForms({ selector }: Props) {
                   placeholder="Digite o código"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="bg-white text-gray-800 placeholder:text-gray-500"
+                  className={inputBaseClassName}
                 />
               </div>
               <Button
@@ -218,7 +253,7 @@ export default function UserForms({ selector }: Props) {
                     placeholder="Digite sua senha"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-white text-gray-800 placeholder:text-gray-500 pr-10"
+                    className={iconInputClassName}
                   />
                   <button
                     type="button"
@@ -240,7 +275,7 @@ export default function UserForms({ selector }: Props) {
                     placeholder="Digite sua senha novamente"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="bg-white text-gray-800 placeholder:text-gray-500 pr-10"
+                    className={iconInputClassName}
                   />
                   <button
                     type="button"

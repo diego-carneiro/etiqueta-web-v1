@@ -2,7 +2,7 @@ import UserForms from "@/components/UserForms";
 
 export default function AdminSignInPage() {
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-gray-200">
       <div className="flex-1 hidden lg:flex items-center justify-center">
         <img src="../img/etiquetalogolarge.png" alt="Sign In" />
       </div>

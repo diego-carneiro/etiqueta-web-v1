@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -10,8 +10,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, UsersRound } from "lucide-react";
-import { useEmployees, useDeleteEmployee } from "@/api/hooks/useEmployee";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  Pencil,
+  Trash2,
+  UsersRound,
+} from "lucide-react";
+import {
+  useDeleteEmployee,
+  useEmployees,
+  useUpdateEmployee,
+} from "@/api/hooks/useEmployee";
 import {
   Dialog,
   DialogContent,
@@ -21,11 +32,20 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { EmailInput } from "@/components/ui/input/email-input";
 
 export default function EmployeesPage() {
   const navigate = useNavigate();
-  const { data, isLoading } = useEmployees();
+  const PAGE_SIZE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data, isLoading } = useEmployees({
+    paginationHeaders: {
+      page: currentPage,
+      pageSize: PAGE_SIZE,
+    },
+  });
   const deleteEmployee = useDeleteEmployee();
+  const updateEmployee = useUpdateEmployee();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -41,6 +61,23 @@ export default function EmployeesPage() {
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [editError, setEditError] = useState("");
+  const [isEmailValid, setIsEmailValid] = useState(true);
+
+  const employees = data?.data ?? [];
+  const totalCount = data?.totalCount ?? 0;
+  const totalPages = data?.totalPages ?? 0;
+
+  const visiblePages = useMemo(
+    () =>
+      Array.from({ length: totalPages }, (_, i) => i + 1).filter(
+        (page) =>
+          page === 1 ||
+          page === totalPages ||
+          Math.abs(page - currentPage) <= 1,
+      ),
+    [currentPage, totalPages],
+  );
 
   const handleConfirmDelete = () => {
     if (selectedEmployee) {
@@ -56,21 +93,69 @@ export default function EmployeesPage() {
   }) => {
     setSelectedEmployee(employee);
     setEditStep("choose");
+    setEditError("");
+    setNewEmail("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setIsEmailValid(true);
     setEditDialogOpen(true);
   };
 
   const handleSubmitEdit = () => {
     if (!selectedEmployee) return;
+
     if (editStep === "email") {
-      console.log("Atualizando e-mail:", newEmail);
+      const emailValue = newEmail.trim();
+
+      if (!emailValue) {
+        setEditError("Informe o novo e-mail.");
+        return;
+      }
+
+      if (!isEmailValid) {
+        return;
+      }
+
+      updateEmployee.mutate(
+        {
+          id: selectedEmployee.id,
+          data: { email: emailValue, password: "" },
+        },
+        {
+          onSuccess: () => {
+            setEditDialogOpen(false);
+            setEditError("");
+          },
+        },
+      );
     } else if (editStep === "password") {
-      console.log("Atualizando senha:", newPassword);
+      if (!newPassword) {
+        setEditError("Informe a nova senha.");
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        setEditError("As senhas não coincidem.");
+        return;
+      }
+
+      updateEmployee.mutate(
+        {
+          id: selectedEmployee.id,
+          data: { email: "", password: newPassword },
+        },
+        {
+          onSuccess: () => {
+            setEditDialogOpen(false);
+            setEditError("");
+          },
+        },
+      );
     }
-    setEditDialogOpen(false);
   };
 
   return (
-    <div className="p-10 bg-gray-100 min-h-screen">
+    <div className="flex flex-col min-h-screen p-8">
       <div className="flex justify-between items-center mb-8">
         <Card className="flex-row items-center bg-white border-none shadow-sm pr-10">
           <CardContent className="flex items-center gap-4 p-6">
@@ -79,7 +164,7 @@ export default function EmployeesPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-800">
-                {data?.data?.length ?? 0}
+                {isLoading ? "..." : totalCount}
               </p>
               <p className="text-sm text-gray-500">Funcionários</p>
             </div>
@@ -93,44 +178,49 @@ export default function EmployeesPage() {
         </Card>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <Table className="w-full">
-          <TableHeader>
-            <TableRow className="border-b border-gray-200">
-              <TableHead className="text-gray-600 font-semibold text-left">
-                Nome
-              </TableHead>
-              <TableHead className="text-gray-600 font-semibold text-left">
-                E-mail
-              </TableHead>
-              <TableHead className="text-gray-600 font-semibold text-center w-24">
-                Editar
-              </TableHead>
-              <TableHead className="text-gray-600 font-semibold text-center w-24">
-                Remover
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="text-center py-6 text-gray-400"
-                >
-                  Carregando funcionários...
-                </TableCell>
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="overflow-y-auto p-4">
+          <Table className="w-full border-separate [border-spacing:0_14px]">
+            <TableHeader className="[&_tr]:border-0">
+              <TableRow className="border-0">
+                <TableHead>#</TableHead>
+                <TableHead>Nome</TableHead>
+                <TableHead>E-mail</TableHead>
+                <TableHead>Editar</TableHead>
+                <TableHead>Remover</TableHead>
               </TableRow>
-            ) : (
-              data?.data?.map(
-                (employee: { id: string; name: string; email: string }) => (
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow className="border-0">
+                  <TableCell
+                    colSpan={5}
+                    className="text-center text-gray-400 py-8 border-0"
+                  >
+                    Carregando funcionários...
+                  </TableCell>
+                </TableRow>
+              ) : employees.length === 0 ? (
+                <TableRow className="border-0">
+                  <TableCell
+                    colSpan={5}
+                    className="text-center text-gray-400 py-8 border-0"
+                  >
+                    Nenhum funcionário encontrado.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                employees.map((employee, index) => (
                   <TableRow
                     key={employee.id}
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors text-gray-700"
+                    className="cursor-pointer border-0 hover:bg-gray-50 transition-colors"
                   >
-                    <TableCell className="py-4">{employee.name}</TableCell>
-                    <TableCell className="py-4">{employee.email}</TableCell>
-                    <TableCell className="text-center">
+                    <TableCell>
+                      {(currentPage - 1) * PAGE_SIZE + index + 1}
+                    </TableCell>
+                    <TableCell>{employee.name}</TableCell>
+                    <TableCell>{employee.email}</TableCell>
+                    <TableCell>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -139,7 +229,7 @@ export default function EmployeesPage() {
                         <Pencil className="h-4 w-4 text-gray-500 hover:text-blue-500 transition-colors" />
                       </Button>
                     </TableCell>
-                    <TableCell className="text-center">
+                    <TableCell>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -155,23 +245,75 @@ export default function EmployeesPage() {
                       </Button>
                     </TableCell>
                   </TableRow>
-                ),
-              )
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
-      <div className="flex justify-end pt-6 text-sm text-gray-500 space-x-2">
-        <span className="cursor-pointer hover:text-blue-600 font-medium">
-          1
-        </span>
-        <span className="cursor-pointer hover:text-blue-600 font-medium">
-          2
-        </span>
-        <span className="cursor-pointer hover:text-blue-600 font-medium">
-          Próx
-        </span>
+        {totalPages > 1 && (
+          <div className="border-t border-gray-100 px-6 py-3 flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              Página {currentPage} de {totalPages} &mdash; {totalCount}{" "}
+              funcionários no total
+            </p>
+
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+
+              {visiblePages
+                .reduce<(number | "...")[]>((acc, p, idx, arr) => {
+                  if (
+                    idx > 0 &&
+                    typeof arr[idx - 1] === "number" &&
+                    p - (arr[idx - 1] as number) > 1
+                  ) {
+                    acc.push("...");
+                  }
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((item, idx) =>
+                  item === "..." ? (
+                    <span
+                      key={`ellipsis-${idx}`}
+                      className="w-8 text-center text-gray-400 text-sm"
+                    >
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={item}
+                      onClick={() => setCurrentPage(item as number)}
+                      className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                        currentPage === item
+                          ? "bg-gray-800 text-white"
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  ),
+                )}
+
+              <button
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages, currentPage + 1))
+                }
+                disabled={currentPage === totalPages}
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -195,10 +337,10 @@ export default function EmployeesPage() {
             </Button>
             <Button
               onClick={handleConfirmDelete}
-              disabled={!selectedEmployee}
+              disabled={!selectedEmployee || deleteEmployee.isPending}
               className="bg-green-600 text-white hover:bg-green-700"
             >
-              Sim
+              {deleteEmployee.isPending ? "Removendo..." : "Sim"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -239,12 +381,17 @@ export default function EmployeesPage() {
           {editStep === "email" && (
             <div className="mt-4 space-y-3">
               <label className="text-gray-700 font-medium">Novo e-mail</label>
-              <Input
-                type="email"
+              <EmailInput
                 value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
+                onChange={(value) => {
+                  setNewEmail(value);
+                  if (editError) {
+                    setEditError("");
+                  }
+                }}
+                onValidityChange={setIsEmailValid}
                 placeholder="Digite o novo e-mail"
-                className="border-none focus:ring-2 focus:ring-gray-200 focus:outline-none mt-4"
+                required
               />
             </div>
           )}
@@ -272,6 +419,10 @@ export default function EmployeesPage() {
             </div>
           )}
 
+          {editError && (
+            <p className="text-sm text-red-500 text-center">{editError}</p>
+          )}
+
           <DialogFooter className="pt-4">
             <Button
               variant="ghost"
@@ -283,9 +434,17 @@ export default function EmployeesPage() {
             {editStep !== "choose" && (
               <Button
                 onClick={handleSubmitEdit}
+                disabled={updateEmployee.isPending}
                 className="bg-green-600 text-white hover:bg-green-700"
               >
-                Salvar
+                {updateEmployee.isPending ? (
+                  <span className="inline-flex items-center">
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Salvando...
+                  </span>
+                ) : (
+                  "Salvar"
+                )}
               </Button>
             )}
           </DialogFooter>

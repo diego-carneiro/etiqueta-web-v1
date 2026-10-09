@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, X } from "lucide-react";
 import { useVehicleByPlate } from "@/api/hooks/useCars";
@@ -10,25 +10,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export default function ClientPage() {
+export default function CustomerPage() {
   const navigate = useNavigate();
   const [licensePlate, setLicensePlate] = useState("");
-  const [customerId, setCustomerId] = useState<string | null>(null);
 
   const [showLoading, setShowLoading] = useState(false);
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [validationError, setValidationError] = useState("");
 
-  const { data: vehicleData, refetch } = useVehicleByPlate(licensePlate);
-  const { data: customerData } = useCustomerById(customerId ?? "");
-
-  useEffect(() => {
-    if (vehicleData && "customerId" in vehicleData) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setCustomerId((vehicleData as any).customerId);
-    }
-  }, [vehicleData]);
+  const { data: vehicleData, refetch } = useVehicleByPlate(licensePlate, {
+    enabled: false,
+  });
+  const { data: customerData } = useCustomerById(vehicleData?.customerId ?? "");
 
   const validatePlate = (plate: string): boolean => {
     const regexOld = /^[A-Z]{3}[0-9]{4}$/;
@@ -74,7 +68,7 @@ export default function ClientPage() {
 
   const handleMoreDetails = () => {
     if (vehicleData) {
-      navigate("/app/user-infos", {
+      navigate("/app/customer-infos", {
         state: {
           vehicle: vehicleData,
           owner: customerData?.name ?? "-",
@@ -83,10 +77,18 @@ export default function ClientPage() {
     }
   };
 
+  const formatInteger = (value: number | null | undefined) => {
+    if (value === null || value === undefined || !Number.isFinite(value)) {
+      return "-";
+    }
+
+    return Math.trunc(value);
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-6">
+    <div className="flex items-center justify-center min-h-screen px-6">
       <div className="flex flex-col items-center max-w-lg">
-        <div className="flex flex-col items-center bg-[#004AAD] backdrop-blur-sm border border-gray-200 rounded-2xl px-8 py-6 shadow-md">
+        <div className="flex flex-col items-center backdrop-blur-sm bg-white border-gray-200 rounded-2xl px-8 py-6 shadow-md">
           <div className="flex items-center w-96 bg-white rounded-xl px-4 py-3 mb-1 shadow-md">
             <Search size={20} className="text-gray-400" />
             <input
@@ -166,11 +168,11 @@ export default function ClientPage() {
               Veículo encontrado
             </DialogTitle>
           </DialogHeader>
-          {vehicleData && customerData && (
+          {vehicleData && (
             <div className="mt-4 text-gray-800 space-y-2">
               <p>
-                <span className="font-bold">Proprietário:</span>
-                {customerData.name || "-"}
+                <span className="font-bold">Proprietário:</span>{" "}
+                {customerData?.name ?? "Carregando..."}
               </p>
               <p>
                 <span className="font-bold">Placa:</span>{" "}
@@ -185,8 +187,8 @@ export default function ClientPage() {
                 {vehicleData.year || "-"}
               </p>
               <p>
-                <span className="font-bold">Km da última troca:</span>
-                {vehicleData.currentMileage || "-"}Km
+                <span className="font-bold">Km da última troca:</span>{" "}
+                {formatInteger(vehicleData.currentMileage)}Km
               </p>
               <div className="flex justify-center">
                 <button

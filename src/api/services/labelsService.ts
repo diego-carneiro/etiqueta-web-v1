@@ -1,4 +1,5 @@
 import api from "../axios";
+import type { PaginatedResponse } from "../types/paginated-response";
 
 export interface Label {
   id: string;
@@ -28,35 +29,40 @@ export interface CreateLabelParams {
 export interface ItemApplied {
   id: string;
   labelId: string;
-  type: number;
-  typeDescription: string;
+  providedServiceId: number;
+  lastChangeDate: string;
+  lastChangeInKm: number;
+  nextChangeDate: string;
+  nextChangeInKm: number;
   brand: string;
   specification: string;
-  nextChangeInKm: number;
-  nextChangeDate: string;
+  viscosity: number;
+  composition: number;
+  packageType: string;
 }
 
-export interface LabelsHistoryRecord {
+export interface LabelsRecord {
+  id: string;
   vehicleId: string;
-  vehicleLicensePlate: string;
   employeeId: string;
+  companyId: string;
+  vehicleLicensePlate: string;
   employeeName: string;
+  companyName: string;
   createdAt: string;
   mileage: number;
   itemsApplied: ItemApplied[];
 }
 
-export interface LabelsHistoryParams {
+export interface LabelsParams {
   employeeName?: string;
-  page?: number;
+  vehicleLicensePlate?: string;
   limit?: number;
 }
 
-export interface LabelsHistoryResponse {
-  data: LabelsHistoryRecord[];
-  total: number;
-  page: number;
-  totalPages: number;
+export interface LabelsPaginationHeaders {
+  page?: number;
+  pageSize?: number;
 }
 
 export const createLabel = async (
@@ -73,16 +79,29 @@ export const getLabelsByVehicleId = async (
   return response.data;
 };
 
-export const getLabelsHistoryByEmployeeId = async (
+export const getLabelsByEmployeeId = async (
   employeeId: string,
-): Promise<LabelsHistoryRecord[]> => {
-  const response = await api.get(`/labels/history/${employeeId}`);
+): Promise<LabelsRecord[]> => {
+  const response = await api.get(`/labels/${employeeId}`);
   return response.data;
 };
 
-export const getLabelsHistory = async (): Promise<LabelsHistoryRecord[]> => {
-  const response = await api.get("/labels/history");
-  console.log(response, "cu");
+export const getLabels = async (
+  params: LabelsParams = {},
+  paginationHeaders?: LabelsPaginationHeaders,
+): Promise<PaginatedResponse<LabelsRecord>> => {
+  const response = await api.get("/labels", {
+    params,
+    headers: {
+      ...(paginationHeaders?.page !== undefined
+        ? { page: String(paginationHeaders.page) }
+        : {}),
+      ...(paginationHeaders?.pageSize !== undefined
+        ? { pageSize: String(paginationHeaders.pageSize) }
+        : {}),
+    },
+  });
+  console.log(response.data);
 
-  return response.data.data;
+  return response.data;
 };

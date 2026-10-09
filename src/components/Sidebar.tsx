@@ -31,7 +31,7 @@ export default function Sidebar() {
 
   const baseMenuItems = [
     { label: "Dashboard", icon: Home, path: `${basePath}/dashboard` },
-    { label: "Clientes", icon: FileText, path: `${basePath}/clients` },
+    { label: "Clientes", icon: FileText, path: `${basePath}/customer` },
     { label: "Funcionários", icon: Users, path: `${basePath}/employees` },
     { label: "Histórico", icon: Settings, path: `${basePath}/logs` },
   ];

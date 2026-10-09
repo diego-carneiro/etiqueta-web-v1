@@ -18,9 +18,12 @@ export const useVehicleById = (vehicleId: string) =>
     enabled: !!vehicleId,
   });
 
-export const useVehicleByPlate = (licensePlate: string) =>
+export const useVehicleByPlate = (
+  licensePlate: string,
+  options?: { enabled?: boolean },
+) =>
   useQuery({
     queryKey: ["vehicleByPlate", licensePlate],
     queryFn: () => getVehicleByPlate(licensePlate),
-    enabled: !!licensePlate,
+    enabled: options?.enabled ?? !!licensePlate,
   });

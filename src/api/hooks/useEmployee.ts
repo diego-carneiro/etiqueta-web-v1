@@ -4,30 +4,24 @@ import {
   createEmployee,
   updateEmployee,
   deleteEmployee,
-  CreateEmployeeDTO,
+  type CreateEmployeeDTO,
+  type GetEmployeesPaginationHeaders,
+  type GetEmployeesParams,
+  type PaginatedEmployeeResponse,
 } from "../services/employeeService";
 
-export type Employee = {
-  id: string;
-  name: string;
-  email: string;
-  role: number;
-  serviceCenterId: string;
-  isActive: boolean;
-};
+export interface UseEmployeesParams {
+  params?: GetEmployeesParams;
+  paginationHeaders: GetEmployeesPaginationHeaders;
+}
 
-export type PaginatedEmployeeResponse = {
-  data: Employee[];
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  totalPages: number;
-};
-
-export const useEmployees = () =>
+export const useEmployees = ({
+  params,
+  paginationHeaders,
+}: UseEmployeesParams) =>
   useQuery<PaginatedEmployeeResponse>({
-    queryKey: ["employees"],
-    queryFn: getEmployees,
+    queryKey: ["employees", params, paginationHeaders],
+    queryFn: () => getEmployees(params, paginationHeaders),
   });
 
 export const useCreateEmployee = () => {
@@ -63,8 +57,8 @@ export const useDeleteEmployee = () => {
 
   return useMutation({
     mutationFn: (employeeId: string) => deleteEmployee(employeeId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["employees"] });
     },
   });
 };

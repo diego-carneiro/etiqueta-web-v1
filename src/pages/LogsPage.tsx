@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useLabelsHistory } from "@/api/hooks/useLabels";
+import { useLabels } from "@/api/hooks/useLabels";
 
 export default function LogsPage() {
   const [employeeIdInput, setEmployeeIdInput] = useState("");
@@ -20,17 +20,14 @@ export default function LogsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const {
-    data: historyData = [],
-    isLoading,
-    isError,
-    error,
-  } = useLabelsHistory();
+  const { data: labelsResponse, isLoading, isError, error } = useLabels();
+  const historyData = labelsResponse?.data ?? [];
 
   const sortedData = useMemo(() => {
     return [...historyData].sort(
       (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        new Date(b.createdAt ?? 0).getTime() -
+        new Date(a.createdAt ?? 0).getTime(),
     );
   }, [historyData]);
 
@@ -91,7 +88,7 @@ export default function LogsPage() {
           onClick={() => handlePageChange(i)}
         >
           {i}
-        </span>
+        </span>,
       );
     }
     return (

@@ -1,14 +1,13 @@
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { getCustomerData, getCustomerById } from "../services/customerService";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import {
+  getCustomerById,
+  getCustomerData,
+  type GetCustomersParams,
+} from "../services/customerService";
 
-interface CustomerQueryParams {
-  page: number;
-  pageSize: number;
-}
-
-export const useCustomer = ({ page, pageSize }: CustomerQueryParams) =>
+export const useCustomer = ({ page, pageSize }: GetCustomersParams) =>
   useQuery({
-    queryKey: ["customer", page, pageSize],
+    queryKey: ["customers", page, pageSize],
     queryFn: () => getCustomerData({ page, pageSize }),
     placeholderData: keepPreviousData,
   });

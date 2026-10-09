@@ -2,9 +2,11 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   createLabel,
   getLabelsByVehicleId,
-  getLabelsHistoryByEmployeeId,
-  getLabelsHistory,
-  CreateLabelParams,
+  getLabelsByEmployeeId,
+  getLabels,
+  type CreateLabelParams,
+  type LabelsPaginationHeaders,
+  type LabelsParams,
 } from "../services/labelsService";
 
 export const useCreateLabel = () =>
@@ -19,15 +21,20 @@ export const useLabelsByVehicleId = (vehicleId: string) =>
     enabled: !!vehicleId,
   });
 
-export const useLabelsHistoryByEmployeeId = (employeeId: string) =>
+export const useLabelsByEmployeeId = (employeeId: string) =>
   useQuery({
-    queryKey: ["labelsHistory", "employee", employeeId],
-    queryFn: () => getLabelsHistoryByEmployeeId(employeeId),
+    queryKey: ["labels", "employee", employeeId],
+    queryFn: () => getLabelsByEmployeeId(employeeId),
     enabled: !!employeeId,
   });
 
-export const useLabelsHistory = () =>
+export interface UseLabelsParams {
+  params?: LabelsParams;
+  paginationHeaders?: LabelsPaginationHeaders;
+}
+
+export const useLabels = (options?: UseLabelsParams) =>
   useQuery({
-    queryKey: ["labelsHistory"],
-    queryFn: () => getLabelsHistory(),
+    queryKey: ["labels", options?.params, options?.paginationHeaders],
+    queryFn: () => getLabels(options?.params, options?.paginationHeaders),
   });

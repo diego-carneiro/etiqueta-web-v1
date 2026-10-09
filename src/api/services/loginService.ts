@@ -7,6 +7,8 @@ type LoginParams = {
 
 export const companyLogin = async (params: LoginParams) => {
   const response = await api.post("/companies/login", params);
+  console.log(response.data);
+  
   return response.data;
 };
 

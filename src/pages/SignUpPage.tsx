@@ -2,15 +2,15 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import TermsOfUse from "@/components/TermsOfUse";
+import PrivacyPolicies from "@/components/PrivacyPolicies";
 import SuccessModal from "@/components/ui/SuccessModal";
 import ErrorModal from "@/components/ErrorModal";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { EmailInput } from "@/components/ui/input/email-input";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import { useRegisterCompany } from "@/api/hooks/useRegisterAuth";
-
-// ─── Constants ────────────────────────────────────────────────────────────────
 
 const ENABLE_VALIDATIONS = import.meta.env.VITE_ENABLE_VALIDATIONS !== "false";
 
@@ -22,7 +22,7 @@ const STEPS = [
   "Termos de uso",
 ];
 
-const SERVICOS = [
+const SERVICES = [
   "Óleo motor",
   "Óleo de freio",
   "Filtro cabine",
@@ -37,17 +37,15 @@ const SERVICOS = [
   "Filtro de combus",
 ];
 
-const DIAS_DEFAULT = [
-  { dia: "Segunda-feira", ativo: false, inicio: "08:00", fim: "18:00" },
-  { dia: "Terça-feira", ativo: false, inicio: "08:00", fim: "18:00" },
-  { dia: "Quarta-feira", ativo: false, inicio: "08:00", fim: "18:00" },
-  { dia: "Quinta-feira", ativo: false, inicio: "08:00", fim: "18:00" },
-  { dia: "Sexta-feira", ativo: false, inicio: "08:00", fim: "18:00" },
-  { dia: "Sábado", ativo: false, inicio: "08:00", fim: "15:00" },
-  { dia: "Domingo", ativo: false, inicio: "08:00", fim: "15:00" },
+const DEFAULT_DAYS = [
+  { day: "Segunda-feira", active: false, start: "08:00", end: "18:00" },
+  { day: "Terça-feira", active: false, start: "08:00", end: "18:00" },
+  { day: "Quarta-feira", active: false, start: "08:00", end: "18:00" },
+  { day: "Quinta-feira", active: false, start: "08:00", end: "18:00" },
+  { day: "Sexta-feira", active: false, start: "08:00", end: "18:00" },
+  { day: "Sábado", active: false, start: "08:00", end: "15:00" },
+  { day: "Domingo", active: false, start: "08:00", end: "15:00" },
 ];
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function generateTimeSlots(): string[] {
   const slots: string[] = [];
@@ -61,76 +59,66 @@ function generateTimeSlots(): string[] {
   return slots;
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type Step2Data = {
+type StoreFormData = {
   cnpj: string;
-  razaoSocial: string;
-  nomeFantasia: string;
+  legalName: string;
+  tradeName: string;
   email: string;
-  cep: string;
-  rua: string;
-  numero: string;
-  bairro: string;
-  redesSociais: string;
-  siteLoja: string;
+  postalCode: string;
+  street: string;
+  number: string;
+  neighborhood: string;
+  socialMedia: string;
+  websiteUrl: string;
 };
 
-type Horario = {
-  dia: string;
-  ativo: boolean;
-  inicio: string;
-  fim: string;
+type Schedule = {
+  day: string;
+  active: boolean;
+  start: string;
+  end: string;
 };
 
 type ModalState = { open: boolean; title: string; message: string };
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function SignUpPage() {
   const { mutateAsync: registerCompany } = useRegisterCompany();
   const navigate = useNavigate();
 
-  // Memoized time slots — only computed once
-  const horariosDisponiveis = useMemo(() => generateTimeSlots(), []);
+  const availableTimeSlots = useMemo(() => generateTimeSlots(), []);
 
-  // Step state
   const [step, setStep] = useState(1);
 
-  // Step 1
   const [email, setEmail] = useState("");
+  const [isPrimaryEmailValid, setIsPrimaryEmailValid] = useState(true);
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Step 2
-  const [step2Data, setStep2Data] = useState<Step2Data>({
+  const [storeFormData, setStoreFormData] = useState<StoreFormData>({
     cnpj: "",
-    razaoSocial: "",
-    nomeFantasia: "",
+    legalName: "",
+    tradeName: "",
     email: "",
-    cep: "",
-    rua: "",
-    numero: "",
-    bairro: "",
-    redesSociais: "",
-    siteLoja: "",
+    postalCode: "",
+    street: "",
+    number: "",
+    neighborhood: "",
+    socialMedia: "",
+    websiteUrl: "",
   });
-  const [step2Errors, setStep2Errors] = useState<
-    Partial<Record<keyof Step2Data, boolean>>
+  const [storeFormErrors, setStoreFormErrors] = useState<
+    Partial<Record<keyof StoreFormData, boolean>>
   >({});
+  const [isStoreEmailValid, setIsStoreEmailValid] = useState(true);
 
-  // Step 3 — split into two distinct states
-  const [servicosSelecionados, setServicosSelecionados] = useState<string[]>(
-    [],
-  );
-  const [horarios, setHorarios] = useState<Horario[]>(DIAS_DEFAULT);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [schedules, setSchedules] = useState<Schedule[]>(DEFAULT_DAYS);
 
-  // Step 5
-  const [aceitouTermos, setAceitouTermos] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
 
-  // Modals
   const [errorModal, setErrorModal] = useState<ModalState>({
     open: false,
     title: "",
@@ -138,27 +126,28 @@ export default function SignUpPage() {
   });
   const [successModal, setSuccessModal] = useState(false);
 
-  // ─── Modal helpers ──────────────────────────────────────────────────────────
-
   const showError = (title: string, message: string) =>
     setErrorModal({ open: true, title, message });
-
-  // ─── Navigation ─────────────────────────────────────────────────────────────
 
   const nextStep = () => setStep((s) => Math.min(s + 1, STEPS.length));
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
 
-  // ─── Step validators ────────────────────────────────────────────────────────
-
   const validateStep1 = (): boolean => {
-    if (!email || !password || !confirm) {
+    if (!email || !password || !confirmPassword) {
       showError(
         "Campos obrigatórios",
         "Todos os campos devem ser preenchidos.",
       );
       return false;
     }
-    if (password !== confirm) {
+    if (!isPrimaryEmailValid) {
+      showError(
+        "Formato inválido",
+        "O e-mail informado não respeita o formato padrão.",
+      );
+      return false;
+    }
+    if (password !== confirmPassword) {
       showError(
         "Senhas não conferem",
         "As senhas digitadas não são iguais. Verifique e tente novamente.",
@@ -169,21 +158,28 @@ export default function SignUpPage() {
   };
 
   const validateStep2 = (): boolean => {
-    const errors: Partial<Record<keyof Step2Data, boolean>> = {};
+    const errors: Partial<Record<keyof StoreFormData, boolean>> = {};
     let hasError = false;
 
-    (Object.keys(step2Data) as (keyof Step2Data)[]).forEach((key) => {
-      if (!step2Data[key].trim()) {
+    (Object.keys(storeFormData) as (keyof StoreFormData)[]).forEach((key) => {
+      if (!storeFormData[key].trim()) {
         errors[key] = true;
         hasError = true;
       }
     });
 
     if (hasError) {
-      setStep2Errors(errors);
+      setStoreFormErrors(errors);
       showError(
         "Campos obrigatórios",
         "Todos os campos devem ser preenchidos antes de avançar. Verifique os campos destacados em vermelho.",
+      );
+      return false;
+    }
+    if (!isStoreEmailValid) {
+      showError(
+        "Formato inválido",
+        "O e-mail da loja não respeita o formato padrão.",
       );
       return false;
     }
@@ -191,7 +187,7 @@ export default function SignUpPage() {
   };
 
   const validateStep3 = (): boolean => {
-    if (servicosSelecionados.length === 0) {
+    if (selectedServices.length === 0) {
       showError(
         "Nenhum serviço selecionado",
         "Por favor, selecione pelo menos um serviço prestado antes de avançar.",
@@ -202,7 +198,7 @@ export default function SignUpPage() {
   };
 
   const validateStep4 = (): boolean => {
-    if (!horarios.some((h) => h.ativo)) {
+    if (!schedules.some((s) => s.active)) {
       showError(
         "Nenhum horário definido",
         "Por favor, ative e defina o horário de funcionamento para pelo menos um dia da semana.",
@@ -211,8 +207,6 @@ export default function SignUpPage() {
     }
     return true;
   };
-
-  // ─── Step advance map ───────────────────────────────────────────────────────
 
   const VALIDATORS: Record<number, () => boolean> = {
     1: validateStep1,
@@ -227,81 +221,73 @@ export default function SignUpPage() {
     }
   };
 
-  // ─── Step 2 field handler ───────────────────────────────────────────────────
-
-  const handleStep2Change = (field: keyof Step2Data, value: string) => {
-    setStep2Data((prev) => ({ ...prev, [field]: value }));
+  const handleStoreFormChange = (field: keyof StoreFormData, value: string) => {
+    setStoreFormData((prev) => ({ ...prev, [field]: value }));
     if (value.trim()) {
-      setStep2Errors((prev) => ({ ...prev, [field]: false }));
+      setStoreFormErrors((prev) => ({ ...prev, [field]: false }));
     }
   };
 
-  // ─── Step 3 handlers ────────────────────────────────────────────────────────
-
-  const toggleServico = (servico: string) => {
-    setServicosSelecionados((prev) =>
-      prev.includes(servico)
-        ? prev.filter((s) => s !== servico)
-        : [...prev, servico],
+  const toggleService = (service: string) => {
+    setSelectedServices((prev) =>
+      prev.includes(service)
+        ? prev.filter((s) => s !== service)
+        : [...prev, service],
     );
   };
 
-  // ─── Step 4 handlers ────────────────────────────────────────────────────────
-
-  const toggleDia = (index: number) => {
-    setHorarios((prev) =>
-      prev.map((h, i) => (i === index ? { ...h, ativo: !h.ativo } : h)),
+  const toggleDay = (index: number) => {
+    setSchedules((prev) =>
+      prev.map((s, i) => (i === index ? { ...s, active: !s.active } : s)),
     );
   };
 
-  const updateHorarioDia = (
+  const updateSchedule = (
     index: number,
-    field: "inicio" | "fim",
+    field: "start" | "end",
     value: string,
   ) => {
-    setHorarios((prev) =>
-      prev.map((h, i) => (i === index ? { ...h, [field]: value } : h)),
+    setSchedules((prev) =>
+      prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)),
     );
   };
 
-  // ─── Final submit ────────────────────────────────────────────────────────────
-
   const handleFinalize = async () => {
-    if (ENABLE_VALIDATIONS && !aceitouTermos) {
+    if (ENABLE_VALIDATIONS && (!acceptedTerms || !acceptedPrivacy)) {
       showError(
-        "Termos não aceitos",
-        "Você deve aceitar os termos de uso antes de finalizar o cadastro.",
+        "Acordos necessários",
+        "Você deve aceitar os termos de uso e as políticas de privacidade antes de finalizar o cadastro.",
       );
       return;
     }
 
     try {
       await registerCompany({
-        legalName: step2Data.razaoSocial,
-        tradeName: step2Data.nomeFantasia,
-        taxId: step2Data.cnpj,
-        email: email,
-        password: password,
-        socialMedia: step2Data.redesSociais,
-        websiteUrl: step2Data.siteLoja,
+        legalName: storeFormData.legalName,
+        tradeName: storeFormData.tradeName,
+        taxId: storeFormData.cnpj,
+        email,
+        password,
+        socialMedia: storeFormData.socialMedia,
+        websiteUrl: storeFormData.websiteUrl,
         address: {
-          postalCode: step2Data.cep,
-          street: step2Data.rua,
-          number: Number(step2Data.numero),
+          postalCode: storeFormData.postalCode,
+          street: storeFormData.street,
+          number: Number(storeFormData.number),
           additionalInfo: "",
-          neighborhood: step2Data.bairro,
+          neighborhood: storeFormData.neighborhood,
           city: "",
           state: "",
         },
         phoneNumbers: [],
-        providedServiceIds: servicosSelecionados.map((_, i) => i + 1),
-        openingHours: horarios
-          .filter((h) => h.ativo)
-          .map((h, index) => ({
+        providedServiceIds: selectedServices.map((_, i) => i + 1),
+        openingHours: schedules
+          .filter((s) => s.active)
+          .map((s, index) => ({
             day: index,
-            start: h.inicio,
-            end: h.fim,
-            description: h.dia,
+            start: s.start,
+            end: s.end,
+            description: s.day,
           })),
       });
 
@@ -315,8 +301,6 @@ export default function SignUpPage() {
     }
   };
 
-  // ─── Input class helper ──────────────────────────────────────────────────────
-
   const inputClass = (hasError?: boolean) =>
     `bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
       hasError
@@ -324,11 +308,8 @@ export default function SignUpPage() {
         : "border border-gray-300"
     }`;
 
-  // ─── Render ──────────────────────────────────────────────────────────────────
-
   return (
     <div className="w-screen h-screen flex bg-[#E5E5E5] overflow-hidden">
-      {/* SIDEBAR */}
       <aside className="w-1/4 bg-[#3358A5] flex items-center justify-center">
         <ul className="flex flex-col gap-10">
           {STEPS.map((label, i) => {
@@ -337,16 +318,10 @@ export default function SignUpPage() {
             return (
               <li key={label} className="flex items-center gap-4">
                 <span
-                  className={`w-4 h-4 rounded-full ${
-                    active
-                      ? "bg-green-500 border-2 border-white"
-                      : "bg-white/50"
-                  }`}
+                  className={`w-4 h-4 rounded-full ${active ? "bg-green-500 border-2 border-white" : "bg-white/50"}`}
                 />
                 <span
-                  className={`text-sm font-medium ${
-                    active ? "text-white" : "text-white/80"
-                  }`}
+                  className={`text-sm font-medium ${active ? "text-white" : "text-white/80"}`}
                 >
                   {label}
                 </span>
@@ -356,11 +331,9 @@ export default function SignUpPage() {
         </ul>
       </aside>
 
-      {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col bg-[#E5E5E5]">
         <div className="flex-1 flex items-center justify-center overflow-y-auto px-4 py-8">
           <div className="w-full max-w-[900px]">
-            {/* STEP 1 — Email e Senha */}
             {step === 1 && (
               <Card className="bg-transparent border-none shadow-none w-full max-w-[420px] mx-auto">
                 <CardContent className="flex flex-col gap-4 p-0">
@@ -368,13 +341,13 @@ export default function SignUpPage() {
                     <Label htmlFor="email" className="text-[#3358A5] mb-2">
                       Email
                     </Label>
-                    <Input
-                      id="email"
-                      type="email"
+                    <EmailInput
                       placeholder="Digite seu email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="bg-white text-gray-800 placeholder:text-gray-500 border-none focus-visible:ring-2 focus-visible:ring-green-500"
+                      onChange={setEmail}
+                      onValidityChange={setIsPrimaryEmailValid}
+                      className="bg-white text-gray-800 placeholder:text-gray-500 border-none focus-visible:ring-2 focus-visible:ring-green-500 mt-0"
+                      required
                     />
                   </div>
 
@@ -406,24 +379,33 @@ export default function SignUpPage() {
                   </div>
 
                   <div className="mb-2">
-                    <Label htmlFor="confirm" className="text-[#3358A5] mb-2">
+                    <Label
+                      htmlFor="confirmPassword"
+                      className="text-[#3358A5] mb-2"
+                    >
                       Confirmar senha
                     </Label>
                     <div className="relative">
                       <Input
-                        id="confirm"
-                        type={showConfirm ? "text" : "password"}
+                        id="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
                         placeholder="Digite sua senha novamente"
-                        value={confirm}
-                        onChange={(e) => setConfirm(e.target.value)}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         className="bg-white text-gray-800 placeholder:text-gray-500 pr-10 border-none focus-visible:ring-2 focus-visible:ring-green-500"
                       />
                       <button
                         type="button"
-                        onClick={() => setShowConfirm(!showConfirm)}
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                       >
-                        {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+                        {showConfirmPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -431,7 +413,6 @@ export default function SignUpPage() {
               </Card>
             )}
 
-            {/* STEP 2 — Informações da Loja */}
             {step === 2 && (
               <div className="w-full space-y-3">
                 <Card className="bg-white border border-gray-200 shadow-sm">
@@ -450,7 +431,7 @@ export default function SignUpPage() {
                           d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
                         />
                       </svg>
-                      Dados da Empresa
+                      Company Data
                     </h3>
                     <div className="grid grid-cols-2 gap-3">
                       {(
@@ -461,12 +442,12 @@ export default function SignUpPage() {
                             placeholder: "00.000.000/0000-00",
                           },
                           {
-                            key: "razaoSocial",
+                            key: "legalName",
                             label: "Razão social",
                             placeholder: "Empresa LTDA",
                           },
                           {
-                            key: "nomeFantasia",
+                            key: "tradeName",
                             label: "Nome fantasia",
                             placeholder: "Nome da loja",
                           },
@@ -481,14 +462,27 @@ export default function SignUpPage() {
                           <Label className="text-[#3358A5] mb-1 text-xs block">
                             {label}
                           </Label>
-                          <Input
-                            value={step2Data[key]}
-                            onChange={(e) =>
-                              handleStep2Change(key, e.target.value)
-                            }
-                            className={inputClass(step2Errors[key])}
-                            placeholder={placeholder}
-                          />
+                          {key === "email" ? (
+                            <EmailInput
+                              value={storeFormData.email}
+                              onChange={(value) =>
+                                handleStoreFormChange("email", value)
+                              }
+                              onValidityChange={setIsStoreEmailValid}
+                              className={inputClass(storeFormErrors[key])}
+                              placeholder={placeholder}
+                              required
+                            />
+                          ) : (
+                            <Input
+                              value={storeFormData[key]}
+                              onChange={(e) =>
+                                handleStoreFormChange(key, e.target.value)
+                              }
+                              className={inputClass(storeFormErrors[key])}
+                              placeholder={placeholder}
+                            />
+                          )}
                         </div>
                       ))}
                     </div>
@@ -517,28 +511,28 @@ export default function SignUpPage() {
                           d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                         />
                       </svg>
-                      Endereço
+                      Address
                     </h3>
                     <div className="grid grid-cols-2 gap-3">
                       {(
                         [
                           {
-                            key: "cep",
+                            key: "postalCode",
                             label: "CEP",
                             placeholder: "00000-000",
                           },
                           {
-                            key: "rua",
+                            key: "street",
                             label: "Nome da rua",
                             placeholder: "Rua exemplo",
                           },
                           {
-                            key: "numero",
+                            key: "number",
                             label: "Número",
                             placeholder: "123",
                           },
                           {
-                            key: "bairro",
+                            key: "neighborhood",
                             label: "Bairro",
                             placeholder: "Centro",
                           },
@@ -549,11 +543,11 @@ export default function SignUpPage() {
                             {label}
                           </Label>
                           <Input
-                            value={step2Data[key]}
+                            value={storeFormData[key]}
                             onChange={(e) =>
-                              handleStep2Change(key, e.target.value)
+                              handleStoreFormChange(key, e.target.value)
                             }
-                            className={inputClass(step2Errors[key])}
+                            className={inputClass(storeFormErrors[key])}
                             placeholder={placeholder}
                           />
                         </div>
@@ -578,18 +572,18 @@ export default function SignUpPage() {
                           d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
                         />
                       </svg>
-                      Presença Digital
+                      Digital Presence
                     </h3>
                     <div className="grid grid-cols-2 gap-3">
                       {(
                         [
                           {
-                            key: "redesSociais",
+                            key: "socialMedia",
                             label: "Redes Sociais",
                             placeholder: "@loja",
                           },
                           {
-                            key: "siteLoja",
+                            key: "websiteUrl",
                             label: "Site loja",
                             placeholder: "www.loja.com.br",
                           },
@@ -600,11 +594,11 @@ export default function SignUpPage() {
                             {label}
                           </Label>
                           <Input
-                            value={step2Data[key]}
+                            value={storeFormData[key]}
                             onChange={(e) =>
-                              handleStep2Change(key, e.target.value)
+                              handleStoreFormChange(key, e.target.value)
                             }
-                            className={inputClass(step2Errors[key])}
+                            className={inputClass(storeFormErrors[key])}
                             placeholder={placeholder}
                           />
                         </div>
@@ -615,7 +609,6 @@ export default function SignUpPage() {
               </div>
             )}
 
-            {/* STEP 3 — Serviços */}
             {step === 3 && (
               <div className="w-full space-y-6">
                 <div>
@@ -623,27 +616,23 @@ export default function SignUpPage() {
                     Serviços prestados
                   </Label>
                   <div className="grid grid-cols-3 gap-3">
-                    {SERVICOS.map((servico) => {
-                      const isSelected = servicosSelecionados.includes(servico);
+                    {SERVICES.map((service) => {
+                      const isSelected = selectedServices.includes(service);
                       return (
                         <button
-                          key={servico}
+                          key={service}
                           type="button"
-                          onClick={() => toggleServico(servico)}
+                          onClick={() => toggleService(service)}
                           className="relative flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all border bg-white border-gray-300 text-gray-700"
                         >
                           <span className="text-left flex-1 pr-2">
-                            {servico}
+                            {service}
                           </span>
                           <div
-                            className={`relative w-11 h-6 rounded-full transition-colors ${
-                              isSelected ? "bg-gray-400" : "bg-gray-300"
-                            }`}
+                            className={`relative w-11 h-6 rounded-full transition-colors ${isSelected ? "bg-gray-400" : "bg-gray-300"}`}
                           >
                             <div
-                              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform flex items-center justify-center ${
-                                isSelected ? "translate-x-5" : "translate-x-0"
-                              }`}
+                              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform flex items-center justify-center ${isSelected ? "translate-x-5" : "translate-x-0"}`}
                             >
                               {isSelected && (
                                 <svg
@@ -670,7 +659,6 @@ export default function SignUpPage() {
               </div>
             )}
 
-            {/* STEP 4 — Dias e Horários */}
             {step === 4 && (
               <div className="w-full space-y-6">
                 <div>
@@ -678,40 +666,32 @@ export default function SignUpPage() {
                     Dias / Horários
                   </Label>
                   <div className="space-y-2">
-                    {horarios.map((horario, index) => (
+                    {schedules.map((schedule, index) => (
                       <div
                         key={index}
                         className="flex items-center gap-4 bg-white rounded-lg px-4 py-3 border border-gray-300"
                       >
                         <button
                           type="button"
-                          onClick={() => toggleDia(index)}
+                          onClick={() => toggleDay(index)}
                           className="flex items-center gap-3 min-w-[140px]"
                         >
                           <div
-                            className={`relative w-11 h-6 rounded-full transition-colors ${
-                              horario.ativo ? "bg-green-500" : "bg-gray-300"
-                            }`}
+                            className={`relative w-11 h-6 rounded-full transition-colors ${schedule.active ? "bg-green-500" : "bg-gray-300"}`}
                           >
                             <div
-                              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform ${
-                                horario.ativo
-                                  ? "translate-x-5"
-                                  : "translate-x-0"
-                              }`}
+                              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform ${schedule.active ? "translate-x-5" : "translate-x-0"}`}
                             />
                           </div>
                           <span
-                            className={`text-sm font-medium ${
-                              horario.ativo ? "text-gray-700" : "text-gray-400"
-                            }`}
+                            className={`text-sm font-medium ${schedule.active ? "text-gray-700" : "text-gray-400"}`}
                           >
-                            {horario.dia}
+                            {schedule.day}
                           </span>
                         </button>
 
                         <div className="flex items-center gap-2">
-                          {(["inicio", "fim"] as const).map((field, fi) => (
+                          {(["start", "end"] as const).map((field, fi) => (
                             <>
                               {fi === 1 && (
                                 <span
@@ -723,20 +703,16 @@ export default function SignUpPage() {
                               )}
                               <select
                                 key={field}
-                                value={horario[field]}
+                                value={schedule[field]}
                                 onChange={(e) =>
-                                  updateHorarioDia(index, field, e.target.value)
+                                  updateSchedule(index, field, e.target.value)
                                 }
-                                disabled={!horario.ativo}
-                                className={`px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                                  !horario.ativo
-                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                    : "bg-white text-gray-700"
-                                }`}
+                                disabled={!schedule.active}
+                                className={`px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent ${!schedule.active ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700"}`}
                               >
-                                {horariosDisponiveis.map((h) => (
-                                  <option key={h} value={h}>
-                                    {h}
+                                {availableTimeSlots.map((t) => (
+                                  <option key={t} value={t}>
+                                    {t}
                                   </option>
                                 ))}
                               </select>
@@ -750,30 +726,55 @@ export default function SignUpPage() {
               </div>
             )}
 
-            {/* STEP 5 — Termos de Uso */}
             {step === 5 && (
               <Card className="bg-transparent border-none shadow-none w-full">
-                <Label className="text-[#3358A5] mb-3 block text-base font-semibold">
-                  Termos de uso
-                </Label>
-                <CardContent className="flex flex-col gap-4 p-0">
-                  <div className="bg-white rounded-lg shadow-inner p-4 h-[400px] overflow-y-auto border border-gray-200">
-                    <TermsOfUse />
+                <CardContent className="flex flex-col gap-6 p-0">
+                  <div>
+                    <Label className="text-[#3358A5] mb-3 block text-base font-semibold">
+                      Termos de uso
+                    </Label>
+                    <div className="bg-white rounded-lg shadow-inner p-4 h-[280px] overflow-y-auto border border-gray-200">
+                      <TermsOfUse />
+                    </div>
+                    <div className="flex items-center gap-3 mt-3">
+                      <input
+                        type="checkbox"
+                        id="accept-terms"
+                        checked={acceptedTerms}
+                        onChange={(e) => setAcceptedTerms(e.target.checked)}
+                        className="w-5 h-5 text-green-500 border-gray-300 rounded focus:ring-green-500"
+                      />
+                      <label
+                        htmlFor="accept-terms"
+                        className="text-sm text-gray-700 cursor-pointer"
+                      >
+                        Li e aceito os termos de uso
+                      </label>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      id="aceitar-termos"
-                      checked={aceitouTermos}
-                      onChange={(e) => setAceitouTermos(e.target.checked)}
-                      className="w-5 h-5 text-green-500 border-gray-300 rounded focus:ring-green-500"
-                    />
-                    <label
-                      htmlFor="aceitar-termos"
-                      className="text-sm text-gray-700 cursor-pointer"
-                    >
-                      Li e aceito os termos de uso
-                    </label>
+
+                  <div>
+                    <Label className="text-[#3358A5] mb-3 block text-base font-semibold">
+                      Políticas de Privacidade
+                    </Label>
+                    <div className="bg-white rounded-lg shadow-inner p-4 h-[280px] overflow-y-auto border border-gray-200">
+                      <PrivacyPolicies />
+                    </div>
+                    <div className="flex items-center gap-3 mt-3">
+                      <input
+                        type="checkbox"
+                        id="accept-privacy"
+                        checked={acceptedPrivacy}
+                        onChange={(e) => setAcceptedPrivacy(e.target.checked)}
+                        className="w-5 h-5 text-green-500 border-gray-300 rounded focus:ring-green-500"
+                      />
+                      <label
+                        htmlFor="accept-privacy"
+                        className="text-sm text-gray-700 cursor-pointer"
+                      >
+                        Li e aceito as políticas de privacidade
+                      </label>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -781,7 +782,6 @@ export default function SignUpPage() {
           </div>
         </div>
 
-        {/* FOOTER BUTTONS */}
         <div className="flex-shrink-0 border-gray-300 bg-[#E5E5E5] py-12">
           <div className="w-full max-w-[600px] mx-auto px-4 flex justify-between">
             <Button
@@ -801,7 +801,10 @@ export default function SignUpPage() {
             ) : (
               <Button
                 onClick={handleFinalize}
-                className="bg-green-500 hover:bg-green-600 text-white px-8 py-2"
+                disabled={
+                  ENABLE_VALIDATIONS && (!acceptedTerms || !acceptedPrivacy)
+                }
+                className="bg-green-500 hover:bg-green-600 text-white px-8 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Finalizar
               </Button>
@@ -810,7 +813,6 @@ export default function SignUpPage() {
         </div>
       </main>
 
-      {/* MODALS */}
       <ErrorModal
         open={errorModal.open}
         onOpenChange={(open) => setErrorModal({ ...errorModal, open })}

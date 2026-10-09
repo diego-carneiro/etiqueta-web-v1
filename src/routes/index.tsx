@@ -12,22 +12,24 @@ import RedefinePasswordPage from "@/pages/RedefinePasswordPage";
 // ---------------- LAYOUTS E PÁGINAS DO APP ----------------
 import MainLayout from "@/pages/layout/MainLayout";
 import DashboardPage from "@/pages/DashboardPage";
-import ClientPage from "@/pages/ClientPage";
+import CustomerPage from "@/pages/CustomerPage";
+import CustomerInfos from "@/pages/CustomerInfos";
 import PaymentsPage from "@/pages/PaymentsPage";
 import EmployeesPage from "@/pages/EmployeesPage";
 import EmployeeRegisterPage from "@/pages/EmployeesRegisterPage";
 import LogsPage from "@/pages/LogsPage";
 import AuditLogs from "@/pages/AuditLogs";
-import UserInfos from "@/pages/UserInfos";
 import AddLabel from "@/pages/AddLabel";
 
 // ---------------- ADMIN ----------------
 import AdminSignInPage from "@/pages/admin/AdminSignInPage";
 import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
 import AdminCompaniesPage from "@/pages/admin/AdminCompaniesPage";
+import AdminCompanyDetailPage from "@/pages/admin/AdminCompanyDetailPage";
 import AdminFinancesPage from "@/pages/admin/AdminFinancesPage";
-import AdminClientsPage from "@/pages/admin/AdminClientsPage";
+import AdminCustomersPage from "@/pages/admin/AdminCustomersPage";
 import AdminEmployeesPage from "@/pages/admin/AdminEmployeesPage";
+import AdminLogsPage from "@/pages/admin/AdminLogsPage";
 
 export const Router = createBrowserRouter([
   // ---------------- PÚBLICAS ----------------
@@ -48,8 +50,8 @@ export const Router = createBrowserRouter([
         element: <MainLayout />,
         children: [
           { path: "dashboard", element: <DashboardPage /> },
-          { path: "user-infos", element: <UserInfos /> },
-          { path: "clients", element: <ClientPage /> },
+          { path: "customer", element: <CustomerPage /> },
+          { path: "customer-infos", element: <CustomerInfos /> },
           { path: "add-label", element: <AddLabel /> },
           { path: "payments", element: <PaymentsPage /> },
           { path: "employees", element: <EmployeesPage /> },
@@ -73,9 +75,11 @@ export const Router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <AdminDashboardPage /> },
           { path: "companies", element: <AdminCompaniesPage /> },
+          { path: "company-details", element: <AdminCompanyDetailPage /> },
           { path: "finances", element: <AdminFinancesPage /> },
-          { path: "clients", element: <AdminClientsPage /> },
+          { path: "customer", element: <AdminCustomersPage /> },
           { path: "employees", element: <AdminEmployeesPage /> },
+          { path: "logs", element: <AdminLogsPage /> },
         ],
       },
     ],

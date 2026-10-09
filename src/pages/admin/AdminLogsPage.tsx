@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -8,46 +8,87 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { UsersRound } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, UsersRound } from "lucide-react";
+import { useLabels } from "@/api/hooks/useLabels";
 
-export default function AdminEmployeesPage() {
-  const [searchName, setSearchName] = useState("");
-  const [searchStore, setSearchStore] = useState("");
-  const [hasSearched, setHasSearched] = useState(false);
+export default function AdminLogsPage() {
+  const PAGE_SIZE = 10;
+  const [employeeNameInput, setEmployeeNameInput] = useState("");
+  const [vehiclePlateInput, setVehiclePlateInput] = useState("");
+  const [employeeNameFilter, setEmployeeNameFilter] = useState("");
+  const [vehiclePlateFilter, setVehiclePlateFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1); // UI is 1-based
 
-  const employees = [
-    {
-      id: "46512354",
-      name: "Murilo Barbosa de Almeida",
-      email: "murilo.barbosa2609@gmail.com",
-      store: "Barracão do óleo",
+  const {
+    data: labelsResponse,
+    isLoading,
+    isError,
+    error,
+  } = useLabels({
+    params: {
+      limit: PAGE_SIZE,
+      employeeName: employeeNameFilter || undefined,
+      vehicleLicensePlate: vehiclePlateFilter || undefined,
     },
-    {
-      id: "46512355",
-      name: "Caio Santana",
-      email: "caiosantana0809@gmail.com",
-      store: "Max lub",
+    paginationHeaders: {
+      page: currentPage,
+      pageSize: PAGE_SIZE,
     },
-    {
-      id: "46512356",
-      name: "Pedro Henrique",
-      email: "pedrohenrique2025@gmail.com",
-      store: "General do óleo",
-    },
-  ];
-
-  const filteredEmployees = employees.filter(
-    (emp) =>
-      emp.name.toLowerCase().includes(searchName.toLowerCase()) &&
-      emp.store.toLowerCase().includes(searchStore.toLowerCase())
-  );
+  });
+  const logs = labelsResponse?.data ?? [];
+  const totalPages = labelsResponse?.totalPages ?? 0;
+  const totalCount = labelsResponse?.totalCount ?? 0;
 
   const handleSearch = () => {
-    setHasSearched(true);
+    setEmployeeNameFilter(employeeNameInput.trim());
+    setVehiclePlateFilter(vehiclePlateInput.trim());
+    setCurrentPage(1);
   };
 
+  const handlePageChange = (page: number) => setCurrentPage(page);
+
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const formatMileage = (mileage: number) => {
+    if (!Number.isFinite(mileage)) {
+      return "-";
+    }
+
+    return String(Math.trunc(mileage));
+  };
+
+  const visiblePages = useMemo(
+    () =>
+      Array.from({ length: totalPages }, (_, i) => i + 1).filter(
+        (page) =>
+          page === 1 ||
+          page === totalPages ||
+          Math.abs(page - currentPage) <= 1,
+      ),
+    [currentPage, totalPages],
+  );
+
+  if (isError) {
+    return (
+      <div className="flex flex-col h-screen bg-gray-100 p-12 overflow-hidden">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          Erro ao carregar logs: {error?.message || "Erro desconhecido"}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col h-screen bg-gray-100 p-12 overflow-hidden">
+    <div className="flex flex-col min-h-screen p-8">
       <div className="flex justify-between items-center mb-8">
         <Card className="bg-white border-none shadow-sm w-46 h-24 flex-shrink-0 flex items-center justify-center ">
           <CardContent className="flex items-center justify-center gap-4 p-5">
@@ -55,8 +96,8 @@ export default function AdminEmployeesPage() {
               <UsersRound className="text-green-600 h-5 w-5" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-800">125</p>
-              <p className="text-sm text-gray-500">Funcionários</p>
+              <p className="text-2xl font-bold text-gray-800">{totalCount}</p>
+              <p className="text-sm text-gray-500">Registros</p>
             </div>
           </CardContent>
         </Card>
@@ -68,91 +109,155 @@ export default function AdminEmployeesPage() {
             </label>
             <input
               type="text"
-              placeholder="Digite seu nome"
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
+              placeholder="Digite o nome do funcionário"
+              value={employeeNameInput}
+              onChange={(e) => setEmployeeNameInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="w-64 bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Loja
+              Placa
             </label>
-            <select
-              value={searchStore}
-              onChange={(e) => setSearchStore(e.target.value)}
+            <input
+              type="text"
+              placeholder="Digite a placa do veículo"
+              value={vehiclePlateInput}
+              onChange={(e) => setVehiclePlateInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="w-64 bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
-            >
-              <option value="">Selecione uma loja</option>
-              <option value="Barracão do óleo">Barracão do óleo</option>
-              <option value="Max lub">Max lub</option>
-              <option value="General do óleo">General do óleo</option>
-            </select>
+            />
           </div>
 
           <button
             onClick={handleSearch}
+            disabled={isLoading}
             className="mt-6 bg-green-600 text-white font-medium px-5 py-2 rounded-lg hover:bg-green-700 transition"
           >
-            Buscar
+            {isLoading ? (
+              <span className="inline-flex items-center">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Carregando...
+              </span>
+            ) : (
+              "Buscar"
+            )}
           </button>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col bg-white rounded-xl shadow-sm overflow-hidden">
-        {hasSearched ? (
-          <>
-            <div className="flex-1 overflow-y-auto p-6">
-              <Table className="w-full">
-                <TableHeader>
-                  <TableRow className="border-b border-gray-200">
-                    <TableHead className="text-gray-600 font-semibold">
-                      ID
-                    </TableHead>
-                    <TableHead className="text-gray-600 font-semibold">
-                      Nome
-                    </TableHead>
-                    <TableHead className="text-gray-600 font-semibold">
-                      Email
-                    </TableHead>
-                    <TableHead className="text-gray-600 font-semibold">
-                      Loja
-                    </TableHead>
-                    <TableHead className="text-gray-600 font-semibold text-right">
-                      Editar
-                    </TableHead>
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="overflow-y-auto p-4">
+          <Table className="w-full border-separate [border-spacing:0_14px]">
+            <TableHeader className="[&_tr]:border-0">
+              <TableRow className="border-0">
+                <TableHead>Nome</TableHead>
+                <TableHead>Placa</TableHead>
+                <TableHead>Data</TableHead>
+                <TableHead>KM</TableHead>
+                <TableHead>Itens</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow className="border-0">
+                  <TableCell
+                    colSpan={5}
+                    className="text-center text-gray-400 py-8 border-0"
+                  >
+                    Carregando logs...
+                  </TableCell>
+                </TableRow>
+              ) : logs.length === 0 ? (
+                <TableRow className="border-0">
+                  <TableCell
+                    colSpan={5}
+                    className="text-center text-gray-400 py-8 border-0"
+                  >
+                    Nenhum registro encontrado.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                logs.map((log, index) => (
+                  <TableRow
+                    key={`${log.id}-${index}`}
+                    className="cursor-pointer border-0 hover:bg-gray-50 transition-colors"
+                  >
+                    <TableCell>{log.employeeName}</TableCell>
+                    <TableCell>{log.vehicleLicensePlate}</TableCell>
+                    <TableCell>{formatDateTime(log.createdAt)}</TableCell>
+                    <TableCell>{formatMileage(log.mileage)}</TableCell>
+                    <TableCell>{log.itemsApplied?.length ?? 0}</TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredEmployees.map((emp) => (
-                    <TableRow
-                      key={emp.id}
-                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                    >
-                      <TableCell>{emp.id}</TableCell>
-                      <TableCell>{emp.name}</TableCell>
-                      <TableCell>{emp.email}</TableCell>
-                      <TableCell>{emp.store}</TableCell>
-                      <TableCell className="text-right text-gray-400">
-                        ...
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
-            <div className="flex justify-end items-center h-12 px-6 border-t border-gray-100 text-sm text-gray-500 space-x-2">
-              <span className="cursor-pointer hover:text-gray-800">1</span>
-              <span className="cursor-pointer hover:text-gray-800">2</span>
-              <span className="cursor-pointer hover:text-gray-800">Próx</span>
+        {totalPages > 1 && (
+          <div className="border-t border-gray-100 px-6 py-3 flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              Página {currentPage} de {totalPages} &mdash; {totalCount} registros
+              no total
+            </p>
+
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+
+              {visiblePages
+                .reduce<(number | "...")[]>((acc, p, idx, arr) => {
+                  if (
+                    idx > 0 &&
+                    typeof arr[idx - 1] === "number" &&
+                    p - (arr[idx - 1] as number) > 1
+                  ) {
+                    acc.push("...");
+                  }
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((item, idx) =>
+                  item === "..." ? (
+                    <span
+                      key={`ellipsis-${idx}`}
+                      className="w-8 text-center text-gray-400 text-sm"
+                    >
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={item}
+                      onClick={() => handlePageChange(item as number)}
+                      className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                        currentPage === item
+                          ? "bg-gray-800 text-white"
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  ),
+                )}
+
+              <button
+                onClick={() =>
+                  handlePageChange(Math.min(totalPages, currentPage + 1))
+                }
+                disabled={currentPage === totalPages}
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
             </div>
-          </>
-        ) : (
-          <div className="flex flex-1 items-center justify-center text-gray-500 text-lg font-medium">
-            Busque através de funcionários ou lojas para visualizar os
-            resultados.
           </div>
         )}
       </div>
