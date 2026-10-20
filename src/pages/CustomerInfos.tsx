@@ -21,7 +21,7 @@ export default function CustomerInfos() {
 
   if (!vehicle) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="flex items-center justify-center h-screen bg-brand-light">
         <p className="text-gray-600">Nenhum dado encontrado.</p>
       </div>
     );
@@ -42,7 +42,7 @@ export default function CustomerInfos() {
 
       <Card className="w-full shadow-none rounded-none border-none">
         <CardContent className="space-y-6 px-2 py-4 md:px-6">
-          <h1 className="text-2xl font-bold text-gray-800 text-center">
+          <h1 className="text-2xl font-extrabold text-brand text-center">
             Informações do Veículo
           </h1>
 
@@ -92,7 +92,7 @@ export default function CustomerInfos() {
           {vehicle.labels?.length > 0 && (
             <div className="flex flex-col">
               <div className="flex items-center justify-between mt-6 mb-2">
-                <h2 className="text-lg font-semibold text-gray-800">
+                <h2 className="text-lg font-bold text-brand-black">
                   Itens Aplicados
                 </h2>
                 <Button
@@ -104,7 +104,7 @@ export default function CustomerInfos() {
                       },
                     })
                   }
-                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+                  className="flex items-center gap-2 bg-brand hover:bg-brand-hover text-white"
                 >
                   <Plus size={16} />
                   Adicionar novo item

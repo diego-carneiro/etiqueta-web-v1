@@ -1,9 +1,9 @@
 export default function PrivacyPolicies() {
   return (
-    <div className="min-h-screen bg-gray-100 py-12">
-      <div className="max-w-4xl mx-auto bg-white p-12 shadow-lg rounded-md font-serif text-gray-800">
+    <div className="min-h-screen bg-brand-light py-12">
+      <div className="max-w-4xl mx-auto bg-white p-12 shadow-lg rounded-md text-brand-black">
 
-        <h1 className="text-2xl font-bold text-center mb-8">
+        <h1 className="text-2xl font-extrabold text-brand text-center mb-8">
           Política de Privacidade – Parceiros e Lojas (Etiqueta Digital)
         </h1>
 
@@ -15,7 +15,7 @@ export default function PrivacyPolicies() {
         </p>
 
         {/* 1 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           1. Informações Coletadas da Loja
         </h2>
 
@@ -40,7 +40,7 @@ export default function PrivacyPolicies() {
         </ul>
 
         {/* 2 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           2. Dados dos Colaboradores (Funcionários)
         </h2>
 
@@ -69,7 +69,7 @@ export default function PrivacyPolicies() {
         </ul>
 
         {/* 3 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           3. Inteligência de Mercado e Business Intelligence (BI)
         </h2>
 
@@ -92,7 +92,7 @@ export default function PrivacyPolicies() {
         </ul>
 
         {/* 4 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           4. Compartilhamento e Exibição de Dados
         </h2>
 
@@ -112,7 +112,7 @@ export default function PrivacyPolicies() {
         </ul>
 
         {/* 5 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           5. Segurança da Informação
         </h2>
 
@@ -123,7 +123,7 @@ export default function PrivacyPolicies() {
         </p>
 
         {/* 6 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           6. Contato e Alterações
         </h2>
 

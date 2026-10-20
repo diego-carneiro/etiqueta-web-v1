@@ -97,7 +97,7 @@ export default function AdminCustomersPage() {
 
   if (isError) {
     return (
-      <div className="flex flex-col h-screen bg-gray-100 p-12 overflow-hidden">
+      <div className="flex flex-col h-screen bg-brand-light p-12 overflow-hidden">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Erro ao carregar clientes: {error?.message || "Erro desconhecido"}
         </div>
@@ -106,21 +106,21 @@ export default function AdminCustomersPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 p-8 gap-6 overflow-hidden">
+    <div className="flex flex-col h-screen bg-brand-light p-8 gap-6 overflow-hidden">
       <div className="flex justify-between items-start">
         <div className="flex gap-4">
           <Card
             onClick={() => handleViewChange("approved")}
             className={`cursor-pointer bg-white border-none shadow-sm transition-all hover:shadow-md ${
-              view === "approved" ? "ring-2 ring-green-400" : ""
+              view === "approved" ? "ring-2 ring-brand" : ""
             }`}
           >
             <CardContent className="flex items-center gap-4 px-5 py-4">
-              <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-                <UsersRound className="text-green-600 h-5 w-5" />
+              <div className="flex items-center justify-center w-10 h-10 bg-brand-light rounded-full">
+                <UsersRound className="text-brand h-5 w-5" />
               </div>
               <div>
-                <p className="text-xl font-bold text-gray-800">
+                <p className="font-display text-xl font-extrabold text-brand-black">
                   {isLoading ? "..." : approvedCount}
                 </p>
                 <p className="text-sm text-gray-500">Clientes cadastrados</p>
@@ -139,7 +139,7 @@ export default function AdminCustomersPage() {
                 <UsersRound className="text-yellow-600 h-5 w-5" />
               </div>
               <div>
-                <p className="text-xl font-bold text-gray-800">
+                <p className="font-display text-xl font-extrabold text-brand-black">
                   {isLoading ? "..." : pendingCount}
                 </p>
                 <p className="text-sm text-gray-500">Clientes pendentes</p>
@@ -167,7 +167,7 @@ export default function AdminCustomersPage() {
 
       <div className="flex-1 min-h-0 bg-white rounded-xl shadow-sm overflow-hidden flex flex-col">
         <div className="px-6 pt-5 pb-2 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-gray-700">
+          <h2 className="text-sm font-bold text-brand-black">
             {view === "approved"
               ? "Clientes Cadastrados"
               : "Clientes Pendentes"}
@@ -220,7 +220,7 @@ export default function AdminCustomersPage() {
                   return (
                     <TableRow
                       key={customer.id}
-                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                      className="border-b border-gray-100 hover:bg-brand-light/60 transition-colors"
                     >
                       <TableCell className="py-4">{customer.name}</TableCell>
                       <TableCell className="py-4">
@@ -257,8 +257,8 @@ export default function AdminCustomersPage() {
                 ) : (
                   <span
                     key={item}
-                    className={`cursor-pointer hover:text-gray-800 ${
-                      item === currentPage ? "text-gray-900 font-semibold" : ""
+                    className={`cursor-pointer hover:text-brand ${
+                      item === currentPage ? "text-brand font-semibold" : ""
                     }`}
                     onClick={() => handlePageChange(item as number)}
                   >
@@ -269,7 +269,7 @@ export default function AdminCustomersPage() {
 
             {currentPage < totalPages && (
               <span
-                className="cursor-pointer hover:text-gray-800"
+                className="cursor-pointer hover:text-brand"
                 onClick={() => handlePageChange(currentPage + 1)}
               >
                 Próx

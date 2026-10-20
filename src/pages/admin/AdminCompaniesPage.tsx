@@ -64,15 +64,15 @@ export default function AdminCompaniesPage() {
           <Card
             onClick={() => handleViewChange("verified")}
             className={`cursor-pointer bg-white border-none shadow-sm transition-all hover:shadow-md ${
-              view === "verified" ? "ring-2 ring-green-400" : ""
+              view === "verified" ? "ring-2 ring-brand" : ""
             }`}
           >
             <CardContent className="flex items-center gap-3 px-5 py-3">
-              <div className="flex items-center justify-center w-9 h-9 bg-green-100 rounded-lg">
-                <UsersRound className="text-green-600 h-4 w-4" />
+              <div className="flex items-center justify-center w-9 h-9 bg-brand-light rounded-lg">
+                <UsersRound className="text-brand h-4 w-4" />
               </div>
               <div>
-                <p className="text-base font-bold text-gray-800">
+                <p className="font-display text-base font-extrabold text-brand-black">
                   {verifiedCount}
                 </p>
                 <p className="text-sm text-gray-500">Lojas verificadas</p>
@@ -91,7 +91,7 @@ export default function AdminCompaniesPage() {
                 <UsersRound className="text-yellow-600 h-4 w-4" />
               </div>
               <div>
-                <p className="text-base font-bold text-gray-800">
+                <p className="font-display text-base font-extrabold text-brand-black">
                   {pendingCount}
                 </p>
                 <p className="text-sm text-gray-500">Lojas pendentes</p>
@@ -107,7 +107,7 @@ export default function AdminCompaniesPage() {
             <TableHeader className="[&_tr]:border-0">
               <TableRow className="border-0">
                 <TableHead>Nome da loja</TableHead>
-                <TableHead>Email</TableHead>
+                <TableHead>E-mail</TableHead>
                 {view === "pending" && <TableHead>Ação</TableHead>}
               </TableRow>
             </TableHeader>
@@ -117,7 +117,7 @@ export default function AdminCompaniesPage() {
                 <TableRow
                   key={company.id}
                   onClick={() => handleCompanyClick(company.id)}
-                  className="cursor-pointer border-0 hover:bg-gray-50 transition-colors"
+                  className="cursor-pointer border-0 hover:bg-brand-light/60 transition-colors"
                 >
                   <TableCell>
                     {company.tradeName || company.legalName}
@@ -134,7 +134,7 @@ export default function AdminCompaniesPage() {
                           approveCompanyMutation.isPending &&
                           approvingCompanyId === company.id
                         }
-                        className="inline-flex items-center justify-center rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70"
+                        className="inline-flex items-center justify-center rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-70"
                       >
                         {approveCompanyMutation.isPending &&
                         approvingCompanyId === company.id ? (
@@ -175,7 +175,7 @@ export default function AdminCompaniesPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-brand-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -209,8 +209,8 @@ export default function AdminCompaniesPage() {
                       onClick={() => setPage(item as number)}
                       className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                         page === item
-                          ? "bg-gray-800 text-white"
-                          : "text-gray-600 hover:bg-gray-100"
+                          ? "bg-brand text-white"
+                          : "text-gray-600 hover:bg-brand-light"
                       }`}
                     >
                       {item}
@@ -221,7 +221,7 @@ export default function AdminCompaniesPage() {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-brand-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>

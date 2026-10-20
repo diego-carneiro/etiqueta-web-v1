@@ -20,7 +20,7 @@ export default function AdminDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex items-center justify-center min-h-screen bg-brand-light">
         <p className="text-gray-500 text-lg">
           Carregando dados do dashboard...
         </p>
@@ -30,7 +30,7 @@ export default function AdminDashboardPage() {
 
   if (hasError) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex items-center justify-center min-h-screen bg-brand-light">
         <p className="text-red-500 text-lg">
           Erro ao carregar os dados do dashboard.
         </p>
@@ -39,9 +39,9 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-200">
+    <div className="flex items-center justify-center min-h-screen bg-brand-light">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-        <Card className="w-80 shadow-md border-none bg-gray-100">
+        <Card className="w-80 shadow-md border-none bg-white">
           <CardContent className="flex flex-col items-center justify-center p-10">
             <p
               className="text-lg
@@ -49,13 +49,13 @@ export default function AdminDashboardPage() {
             >
               Total de Lojas Cadastradas
             </p>
-            <p className="text-5xl font-bold text-blue-600 mt-4">
+            <p className="font-display text-5xl font-extrabold text-brand mt-4">
               {companiesData?.totalCount ?? 0}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="w-80 shadow-md border-none bg-gray-100">
+        <Card className="w-80 shadow-md border-none bg-white">
           <CardContent className="flex flex-col items-center justify-center p-10">
             <p
               className="text-lg
@@ -63,7 +63,7 @@ export default function AdminDashboardPage() {
             >
               Total de Etiquetas Geradas
             </p>
-            <p className="text-5xl font-bold text-green-600 mt-4">
+            <p className="font-display text-5xl font-extrabold text-brand-black mt-4">
               {labelsData?.totalCount ?? 0}
             </p>
           </CardContent>

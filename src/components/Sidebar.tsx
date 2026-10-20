@@ -11,6 +11,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import BrandLogo from "@/components/BrandLogo";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -56,16 +57,12 @@ export default function Sidebar() {
     : baseMenuItems;
 
   return (
-    <aside className="w-64 h-screen bg-[#004AAD] p-6 flex flex-col">
-      <div className="flex justify-center mb-8 mt-2">
-        <img
-          src="../../img/etiquetalogomedium.png"
-          alt="Logo"
-          className="w-40 h-auto"
-        />
+    <aside className="w-64 h-screen bg-brand p-6 flex flex-col">
+      <div className="flex justify-center mb-10 mt-2">
+        <BrandLogo className="w-full max-w-48 text-brand-light" />
       </div>
 
-      <h2 className="text-sm text-white font-semibold mb-4 tracking-wide">
+      <h2 className="font-display text-xs text-brand-light/80 font-bold mb-4 uppercase tracking-[0.3em]">
         Menu
       </h2>
 
@@ -97,7 +94,11 @@ export default function Sidebar() {
                       <Link
                         key={sub.path}
                         to={sub.path}
-                        className="flex items-center gap-3 px-2 py-1.5 rounded-md text-sm text-white"
+                        className={`flex items-center gap-3 px-2 py-1.5 rounded-md text-sm transition-colors duration-150 ${
+                          location.pathname === sub.path
+                            ? "bg-white/15 text-white font-semibold"
+                            : "text-white/80 hover:text-white hover:bg-white/10"
+                        }`}
                       >
                         <sub.icon size={16} />
                         {sub.label}
@@ -114,12 +115,15 @@ export default function Sidebar() {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition-colors duration-150 ${
+              className={`relative flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition-colors duration-150 ${
                 isActive
                   ? "bg-white/15 text-white font-semibold"
                   : "text-white/70 hover:text-white hover:bg-white/10"
               }`}
             >
+              {isActive && (
+                <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-brand-green" />
+              )}
               <item.icon
                 size={18}
                 className={isActive ? "text-white" : "text-white/80"}

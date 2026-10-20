@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 
 export default function AuditDetails() {
   return (
-    <div className="w-full min-h-screen flex items-start justify-center bg-gray-100 py-16">
+    <div className="w-full min-h-screen flex items-start justify-center bg-brand-light py-16">
       <div className="w-full max-w-5xl space-y-10">
         {/* Cabeçalho com dados principais */}
         <div className="flex flex-wrap gap-6">

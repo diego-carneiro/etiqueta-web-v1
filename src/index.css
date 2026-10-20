@@ -1,1 +1,153 @@
 @import "tailwindcss";
+
+/* Mantém as variantes `dark:` dos componentes shadcn presas à classe `.dark`
+   (e não ao tema do sistema operacional). */
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   Identidade visual — Etiqueta Digital (docs/Etiqueta_Digital_Manual_v1.pdf)
+
+   Paleta oficial
+   - #121CFA  Azul elétrico   → cor principal, protagonista da marca
+   - #5EC667  Verde           → apoio, uso pontual em pequenos destaques
+   - #00020E  Preto profundo  → contraste e base para as cores de destaque
+   - #E5F4FF  Azul muito claro→ leveza; fundos e superfícies suaves
+
+   Regras de contraste do manual
+   - NÃO usar o azul em cima do preto.
+   - NÃO usar o verde em cima do branco (nem de fundos quase brancos).
+     O verde entra sobre o azul ou o preto, com texto em preto profundo.
+
+   Tipografia
+   - Títulos ......... Oxanium Extra Bold  (font-display font-extrabold)
+   - Subtítulos ...... Oxanium Bold ou Manrope Bold
+   - Texto corrido ... Manrope Regular     (font-sans, padrão do body)
+   - Orbitron é exclusiva do logotipo — não usar na interface.
+   ========================================================================== */
+
+@theme {
+  --color-brand: #121cfa;
+  --color-brand-hover: #0c14d4;
+  --color-brand-green: #5ec667;
+  --color-brand-green-hover: #4fb758;
+  --color-brand-black: #00020e;
+  --color-brand-light: #e5f4ff;
+
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Oxanium", "Manrope", ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+/* Tokens semânticos do shadcn/ui apontando para a paleta oficial. */
+:root {
+  --radius: 0.625rem;
+  --background: #ffffff;
+  --foreground: var(--color-brand-black);
+  --card: #ffffff;
+  --card-foreground: var(--color-brand-black);
+  --popover: #ffffff;
+  --popover-foreground: var(--color-brand-black);
+  --primary: var(--color-brand);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-brand-light);
+  --secondary-foreground: var(--color-brand);
+  --muted: var(--color-brand-light);
+  --muted-foreground: #5b6275;
+  --accent: var(--color-brand-light);
+  --accent-foreground: var(--color-brand);
+  --destructive: #dc2626;
+  --border: #e5e7eb;
+  --input: #d1d5db;
+  --ring: var(--color-brand);
+  --chart-1: var(--color-brand);
+  --chart-2: var(--color-brand-green);
+  --chart-3: var(--color-brand-black);
+  --chart-4: #7d84fc;
+  --chart-5: #a9d8ff;
+}
+
+/* Tema escuro: base em preto profundo. Pelo manual, o azul não vai sobre o
+   preto — o destaque passa a ser o verde (com texto em preto profundo). */
+.dark {
+  --background: var(--color-brand-black);
+  --foreground: var(--color-brand-light);
+  --card: #0b0e1f;
+  --card-foreground: var(--color-brand-light);
+  --popover: #0b0e1f;
+  --popover-foreground: var(--color-brand-light);
+  --primary: var(--color-brand-green);
+  --primary-foreground: var(--color-brand-black);
+  --secondary: #151a33;
+  --secondary-foreground: var(--color-brand-light);
+  --muted: #151a33;
+  --muted-foreground: #a3b4c8;
+  --accent: #151a33;
+  --accent-foreground: var(--color-brand-light);
+  --destructive: #f87171;
+  --border: rgb(229 244 255 / 12%);
+  --input: rgb(229 244 255 / 18%);
+  --ring: var(--color-brand-green);
+  --chart-1: var(--color-brand-green);
+  --chart-2: var(--color-brand-light);
+  --chart-3: #a9d8ff;
+  --chart-4: #7fd487;
+  --chart-5: #5b6275;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-brand-light font-sans text-brand-black antialiased;
+  }
+
+  /* Títulos: Oxanium Extra Bold. Subtítulos: Oxanium Bold. */
+  h1,
+  h2 {
+    @apply font-display font-extrabold;
+  }
+
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display font-bold;
+  }
+
+  ::selection {
+    @apply bg-brand text-white;
+  }
+}

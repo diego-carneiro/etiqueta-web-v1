@@ -65,7 +65,7 @@ export function EmailInput({
         placeholder={placeholder}
         aria-invalid={shouldShowError}
         disabled={disabled}
-        className={`border-none focus:ring-2 focus:ring-gray-200 focus:outline-none mt-4 ${className}`.trim()}
+        className={`border-none focus:ring-2 focus:ring-brand/40 focus:outline-none mt-4 ${className}`.trim()}
       />
       {shouldShowError && <p className="text-sm text-red-500">{errorMessage}</p>}
     </div>

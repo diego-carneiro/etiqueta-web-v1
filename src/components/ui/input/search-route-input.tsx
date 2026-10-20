@@ -134,7 +134,7 @@ export function SearchRouteInput<T = unknown>({
             void executeSearch(value);
           }
         }}
-        className={`${className} bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400`}
+        className={`${className} bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand/40`}
       />
     </div>
   );

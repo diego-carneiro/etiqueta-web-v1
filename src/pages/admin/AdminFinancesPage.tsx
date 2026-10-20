@@ -51,7 +51,7 @@ export default function AdminFinancesPage() {
   const stores = view === "paid" ? paidStores : pendingStores;
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 p-12 overflow-hidden">
+    <div className="flex flex-col h-screen bg-brand-light p-12 overflow-hidden">
       {/* CARDS + BUSCA */}
       <div className="flex justify-between items-start mb-8">
         <div className="flex gap-6">
@@ -59,15 +59,15 @@ export default function AdminFinancesPage() {
           <Card
             onClick={() => setView("paid")}
             className={`cursor-pointer bg-white border-none shadow-sm hover:shadow-md transition-all ${
-              view === "paid" ? "ring-2 ring-green-400" : ""
+              view === "paid" ? "ring-2 ring-brand" : ""
             }`}
           >
             <CardContent className="flex items-center gap-3 px-5 py-3">
-              <div className="flex items-center justify-center w-9 h-9 bg-green-100 rounded-lg">
-                <WalletMinimal className="text-green-600 h-4 w-4" />
+              <div className="flex items-center justify-center w-9 h-9 bg-brand-light rounded-lg">
+                <WalletMinimal className="text-brand h-4 w-4" />
               </div>
               <div>
-                <p className="text-base font-bold text-gray-800">
+                <p className="font-display text-base font-extrabold text-brand-black">
                   {paidStores.length}
                 </p>
                 <p className="text-sm text-gray-500">Lojas faturas pagas</p>
@@ -87,7 +87,7 @@ export default function AdminFinancesPage() {
                 <WalletCards className="text-red-600 h-4 w-4" />
               </div>
               <div>
-                <p className="text-base font-bold text-gray-800">
+                <p className="font-display text-base font-extrabold text-brand-black">
                   {pendingStores.length}
                 </p>
                 <p className="text-sm text-gray-500">Lojas faturas pendentes</p>
@@ -102,7 +102,7 @@ export default function AdminFinancesPage() {
                 <BadgeDollarSign className="text-yellow-600 h-4 w-4" />
               </div>
               <div>
-                <p className="text-base font-bold text-gray-800">Baixa</p>
+                <p className="font-display text-base font-extrabold text-brand-black">Baixa</p>
                 <p className="text-sm text-gray-500">De pagamentos</p>
               </div>
             </CardContent>
@@ -115,13 +115,13 @@ export default function AdminFinancesPage() {
           <input
             type="text"
             placeholder="Digite o nome da loja"
-            className="w-64 bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            className="w-64 bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand/40"
           />
 
           <label className="text-sm font-medium text-gray-700 mt-4 mb-1">
             Status
           </label>
-          <select className="w-64 bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          <select className="w-64 bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand/40">
             <option>Selecione</option>
             <option>Pagos</option>
             <option>Pendentes</option>
@@ -155,7 +155,7 @@ export default function AdminFinancesPage() {
               {stores.map((item) => (
                 <TableRow
                   key={item.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 text-gray-700"
+                  className="border-b border-gray-100 hover:bg-brand-light/60 text-gray-700"
                 >
                   <TableCell className="py-3">{item.id}</TableCell>
                   <TableCell className="py-3">{item.name}</TableCell>
@@ -164,7 +164,7 @@ export default function AdminFinancesPage() {
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
                         item.status === "Pago"
-                          ? "bg-green-50 text-green-600"
+                          ? "bg-brand-light text-brand"
                           : "bg-yellow-50 text-yellow-600"
                       }`}
                     >
@@ -179,13 +179,13 @@ export default function AdminFinancesPage() {
 
         {/* PAGINAÇÃO */}
         <div className="h-12 border-t border-gray-100 flex items-center justify-end px-6 text-sm text-gray-500 space-x-2">
-          <span className="cursor-pointer hover:text-gray-800">1</span>
-          <span className="cursor-pointer hover:text-gray-800">2</span>
-          <span className="cursor-pointer hover:text-gray-800">3</span>
-          <span className="cursor-pointer hover:text-gray-800">4</span>
-          <span className="cursor-pointer hover:text-gray-800">5</span>
-          <span className="cursor-pointer hover:text-gray-800">12</span>
-          <span className="cursor-pointer hover:text-gray-800">Prox</span>
+          <span className="cursor-pointer hover:text-brand">1</span>
+          <span className="cursor-pointer hover:text-brand">2</span>
+          <span className="cursor-pointer hover:text-brand">3</span>
+          <span className="cursor-pointer hover:text-brand">4</span>
+          <span className="cursor-pointer hover:text-brand">5</span>
+          <span className="cursor-pointer hover:text-brand">12</span>
+          <span className="cursor-pointer hover:text-brand">Prox</span>
         </div>
       </div>
     </div>

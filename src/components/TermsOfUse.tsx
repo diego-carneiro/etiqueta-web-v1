@@ -1,10 +1,10 @@
 export default function TermsOfUse() {
   return (
-    <div className="min-h-screen bg-gray-100 py-12">
-      <div className="max-w-4xl mx-auto bg-white p-12 shadow-lg rounded-md font-serif text-gray-800">
+    <div className="min-h-screen bg-brand-light py-12">
+      <div className="max-w-4xl mx-auto bg-white p-12 shadow-lg rounded-md text-brand-black">
 
         {/* TÍTULO */}
-        <h1 className="text-2xl font-bold text-center mb-8">
+        <h1 className="text-2xl font-extrabold text-brand text-center mb-8">
           Termos de Uso e Contrato de Parceria – Loja Parceira (Etiqueta Digital)
         </h1>
 
@@ -16,7 +16,7 @@ export default function TermsOfUse() {
         </p>
 
         {/* 1 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           1. Objeto e Funcionalidades
         </h2>
 
@@ -36,7 +36,7 @@ export default function TermsOfUse() {
         </ul>
 
         {/* 2 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           2. Responsabilidade Técnica, Qualidade e Ética
         </h2>
 
@@ -77,7 +77,7 @@ export default function TermsOfUse() {
         </ul>
 
         {/* 3 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           3. Propriedade de Dados e Business Intelligence (BI)
         </h2>
 
@@ -97,7 +97,7 @@ export default function TermsOfUse() {
         </p>
 
         {/* 4 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           4. Gestão de Funcionários e Acessos
         </h2>
 
@@ -119,7 +119,7 @@ export default function TermsOfUse() {
         </p>
 
         {/* 5 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           5. Pagamento e Inadimplência
         </h2>
 
@@ -136,7 +136,7 @@ export default function TermsOfUse() {
         </ul>
 
         {/* 6 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           6. Suporte Técnico
         </h2>
 
@@ -151,7 +151,7 @@ export default function TermsOfUse() {
         </p>
 
         {/* 7 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           7. Promoções e Fidelidade
         </h2>
 
@@ -163,7 +163,7 @@ export default function TermsOfUse() {
         </p>
 
         {/* 8 */}
-        <h2 className="text-lg font-semibold mt-10 mb-4">
+        <h2 className="text-lg font-bold text-brand-black mt-10 mb-4">
           8. Disposições Gerais
         </h2>
 

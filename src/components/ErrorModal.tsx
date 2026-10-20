@@ -24,13 +24,13 @@ export default function ErrorModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-white border-none">
         <DialogHeader>
-          <DialogTitle className="text-[#3358A5]">{title}</DialogTitle>
+          <DialogTitle className="text-brand">{title}</DialogTitle>
         </DialogHeader>
         <p className="text-gray-700">{message}</p>
         <DialogFooter>
           <Button
             onClick={() => onOpenChange(false)}
-            className="bg-green-500 hover:bg-green-600 text-white"
+            className="bg-brand hover:bg-brand-hover text-white"
           >
             Fechar
           </Button>

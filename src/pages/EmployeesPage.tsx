@@ -159,18 +159,18 @@ export default function EmployeesPage() {
       <div className="flex justify-between items-center mb-8">
         <Card className="flex-row items-center bg-white border-none shadow-sm pr-10">
           <CardContent className="flex items-center gap-4 p-6">
-            <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-              <UsersRound className="text-green-600 h-5 w-5" />
+            <div className="flex items-center justify-center w-10 h-10 bg-brand-light rounded-full">
+              <UsersRound className="text-brand h-5 w-5" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-800">
+              <p className="font-display text-2xl font-extrabold text-brand-black">
                 {isLoading ? "..." : totalCount}
               </p>
               <p className="text-sm text-gray-500">Funcionários</p>
             </div>
           </CardContent>
           <Button
-            className="bg-green-500 text-white hover:bg-green-600 px-6 py-2 text-sm font-semibold rounded-md"
+            className="bg-brand text-white hover:bg-brand-hover px-6 py-2 text-sm font-semibold rounded-md"
             onClick={() => navigate("/app/employee-register")}
           >
             Cadastrar
@@ -213,7 +213,7 @@ export default function EmployeesPage() {
                 employees.map((employee, index) => (
                   <TableRow
                     key={employee.id}
-                    className="cursor-pointer border-0 hover:bg-gray-50 transition-colors"
+                    className="cursor-pointer border-0 hover:bg-brand-light/60 transition-colors"
                   >
                     <TableCell>
                       {(currentPage - 1) * PAGE_SIZE + index + 1}
@@ -226,7 +226,7 @@ export default function EmployeesPage() {
                         size="icon"
                         onClick={() => handleEditClick(employee)}
                       >
-                        <Pencil className="h-4 w-4 text-gray-500 hover:text-blue-500 transition-colors" />
+                        <Pencil className="h-4 w-4 text-gray-500 hover:text-brand transition-colors" />
                       </Button>
                     </TableCell>
                     <TableCell>
@@ -262,7 +262,7 @@ export default function EmployeesPage() {
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-brand-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -293,8 +293,8 @@ export default function EmployeesPage() {
                       onClick={() => setCurrentPage(item as number)}
                       className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                         currentPage === item
-                          ? "bg-gray-800 text-white"
-                          : "text-gray-600 hover:bg-gray-100"
+                          ? "bg-brand text-white"
+                          : "text-gray-600 hover:bg-brand-light"
                       }`}
                     >
                       {item}
@@ -307,7 +307,7 @@ export default function EmployeesPage() {
                   setCurrentPage(Math.min(totalPages, currentPage + 1))
                 }
                 disabled={currentPage === totalPages}
-                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-brand-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -319,7 +319,7 @@ export default function EmployeesPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="bg-white border-none shadow-lg rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-gray-800">
+            <DialogTitle className="text-lg font-bold text-brand-black">
               Remover Funcionário
             </DialogTitle>
             <DialogDescription className="text-gray-600">
@@ -331,14 +331,14 @@ export default function EmployeesPage() {
             <Button
               variant="ghost"
               onClick={() => setDialogOpen(false)}
-              className="text-gray-700 hover:bg-gray-100"
+              className="text-gray-700 hover:bg-brand-light"
             >
               Cancelar
             </Button>
             <Button
               onClick={handleConfirmDelete}
               disabled={!selectedEmployee || deleteEmployee.isPending}
-              className="bg-green-600 text-white hover:bg-green-700"
+              className="bg-brand text-white hover:bg-brand-hover"
             >
               {deleteEmployee.isPending ? "Removendo..." : "Sim"}
             </Button>
@@ -349,7 +349,7 @@ export default function EmployeesPage() {
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="bg-white border-none shadow-lg rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-gray-600 mb-10">
+            <DialogTitle className="text-lg font-bold text-gray-600 mb-10">
               Editando dados de: {selectedEmployee?.name}
             </DialogTitle>
             <div className="flex justify-center">
@@ -364,13 +364,13 @@ export default function EmployeesPage() {
           {editStep === "choose" && (
             <div className="flex justify-center gap-4 mt-4">
               <Button
-                className="bg-green-500 text-white hover:bg-green-600 px-6 py-2"
+                className="bg-brand text-white hover:bg-brand-hover px-6 py-2"
                 onClick={() => setEditStep("email")}
               >
                 E-mail
               </Button>
               <Button
-                className="bg-green-500 text-white hover:bg-green-600 px-6 py-2"
+                className="bg-brand text-white hover:bg-brand-hover px-6 py-2"
                 onClick={() => setEditStep("password")}
               >
                 Senha
@@ -404,7 +404,7 @@ export default function EmployeesPage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Digite a nova senha"
-                className="border-none focus:ring-2 focus:ring-gray-200 focus:outline-none mt-4"
+                className="border-none focus:ring-2 focus:ring-brand/40 focus:outline-none mt-4"
               />
               <label className="text-gray-700 font-medium">
                 Confirme a nova senha
@@ -414,7 +414,7 @@ export default function EmployeesPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirme a nova senha"
-                className="border-none focus:ring-2 focus:ring-gray-200 focus:outline-none mt-4"
+                className="border-none focus:ring-2 focus:ring-brand/40 focus:outline-none mt-4"
               />
             </div>
           )}
@@ -427,7 +427,7 @@ export default function EmployeesPage() {
             <Button
               variant="ghost"
               onClick={() => setEditDialogOpen(false)}
-              className="text-gray-700 hover:bg-gray-100"
+              className="text-gray-700 hover:bg-brand-light"
             >
               Cancelar
             </Button>
@@ -435,7 +435,7 @@ export default function EmployeesPage() {
               <Button
                 onClick={handleSubmitEdit}
                 disabled={updateEmployee.isPending}
-                className="bg-green-600 text-white hover:bg-green-700"
+                className="bg-brand text-white hover:bg-brand-hover"
               >
                 {updateEmployee.isPending ? (
                   <span className="inline-flex items-center">
