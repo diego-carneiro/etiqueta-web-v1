@@ -16,6 +16,7 @@ import {
 import { X, Eye, EyeOff } from "lucide-react";
 import { useCompanyLogin, useAdminLogin } from "@/api/hooks/useLoginAuth";
 import WaitingApproval from "./WaitingApproval";
+import BrandLogo from "./BrandLogo";
 
 type LoginResponse = {
   id: string;
@@ -38,7 +39,7 @@ export default function UserForms({
   onWaitingApproval,
 }: UserFormsProps) {
   const inputBaseClassName =
-    "bg-white text-gray-800 placeholder:text-gray-500 border-none focus:ring-2 focus:ring-gray-200 focus:outline-none";
+    "bg-white text-brand-black placeholder:text-gray-500 border-none focus:ring-2 focus:ring-brand-green focus:outline-none";
   const iconInputClassName = `${inputBaseClassName} pr-10`;
 
   const [email, setEmail] = useState("");
@@ -93,10 +94,10 @@ export default function UserForms({
   };
 
   return (
-    <div className="relative h-screen flex items-center justify-center bg-[#3358A5]">
+    <div className="relative h-screen flex items-center justify-center bg-brand">
       {selector === "sign-in" && (
         <div className="absolute top-8 left-1/2 -translate-x-1/2 flex items-center justify-center mb-72">
-          <img src="../img/etiquetalogomedium.png" alt="Logo" />
+          <BrandLogo variant="symbol" className="w-24 text-brand-light" />
         </div>
       )}
 
@@ -104,17 +105,17 @@ export default function UserForms({
         {selector === "sign-in" && (
           <Card className="bg-transparent border-none shadow-none">
             <CardContent className="flex flex-col gap-4 p-0">
-              <p className="text-white mt-30 mb-6 text-center text-lg font-bold">
+              <p className="font-display text-white mt-30 mb-6 text-center text-xl font-bold">
                 {isAdmin
                   ? "Entre com sua conta de administrador"
                   : "Acesse sua loja"}
               </p>
               <div>
                 <Label htmlFor="email" className="text-white mb-2">
-                  Email
+                  E-mail
                 </Label>
                 <EmailInput
-                  placeholder="Digite seu email"
+                  placeholder="Digite seu e-mail"
                   value={email}
                   onChange={setEmail}
                   onValidityChange={setIsEmailValid}
@@ -149,7 +150,7 @@ export default function UserForms({
               <Button
                 onClick={handleLogin}
                 disabled={loginMutation.isPending}
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full mt-2"
+                className="bg-brand-green hover:bg-brand-green-hover text-brand-black font-bold rounded-full mt-2"
               >
                 {loginMutation.isPending ? "Entrando..." : "Entrar"}
               </Button>
@@ -157,7 +158,7 @@ export default function UserForms({
               {!isAdmin && (
                 <Button
                   onClick={() => navigate("/sign-up")}
-                  className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full"
+                  className="bg-transparent border-2 border-brand-light text-brand-light hover:bg-white/10 font-bold rounded-full"
                 >
                   Cadastrar
                 </Button>
@@ -179,14 +180,14 @@ export default function UserForms({
           <Card className="bg-transparent border-none shadow-none">
             <CardContent className="flex flex-col gap-4 p-0">
               <p className="text-center text-white text-sm">
-                Insira o Email utilizado para acessar a conta
+                Insira o e-mail utilizado para acessar a conta
               </p>
               <div>
                 <Label htmlFor="email" className="text-white mb-2">
-                  Email
+                  E-mail
                 </Label>
                 <EmailInput
-                  placeholder="Digite seu email"
+                  placeholder="Digite seu e-mail"
                   value={email}
                   onChange={setEmail}
                   onValidityChange={setIsEmailValid}
@@ -202,7 +203,7 @@ export default function UserForms({
 
                   navigate("/recover-code");
                 }}
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full"
+                className="bg-brand-green hover:bg-brand-green-hover text-brand-black font-bold rounded-full"
               >
                 Recuperar
               </Button>
@@ -214,7 +215,7 @@ export default function UserForms({
           <Card className="bg-transparent border-none shadow-none">
             <CardContent className="flex flex-col gap-4 p-0">
               <p className="text-center text-white text-sm">
-                Insira o código que foi enviado ao Email digitado anteriormente
+                Insira o código que foi enviado ao e-mail digitado anteriormente
               </p>
               <div>
                 <Label htmlFor="code" className="text-white mb-2">
@@ -231,7 +232,7 @@ export default function UserForms({
               </div>
               <Button
                 onClick={() => navigate("/redefine-password")}
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full"
+                className="bg-brand-green hover:bg-brand-green-hover text-brand-black font-bold rounded-full"
               >
                 Avançar
               </Button>
@@ -292,7 +293,7 @@ export default function UserForms({
               </div>
               <Button
                 onClick={() => alert("Senha alterada com sucesso!")}
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full"
+                className="bg-brand-green hover:bg-brand-green-hover text-brand-black font-bold rounded-full"
               >
                 Alterar Senha
               </Button>

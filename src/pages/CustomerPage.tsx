@@ -97,7 +97,7 @@ export default function CustomerPage() {
               value={licensePlate}
               onChange={(e) => setLicensePlate(e.target.value.toUpperCase())}
               onKeyDown={handleKeyDown}
-              className="flex-1 ml-3 bg-transparent text-base text-gray-800 outline-none"
+              className="flex-1 ml-3 bg-transparent text-base text-brand-black outline-none"
             />
           </div>{" "}
           <div className="h-6 mt-1">
@@ -107,7 +107,7 @@ export default function CustomerPage() {
           </div>
           <button
             onClick={handleSearch}
-            className="w-96 bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg mt-4 text-white font-semibold transition-colors"
+            className="w-96 bg-brand hover:bg-brand-hover px-6 py-3 rounded-lg mt-4 text-white font-semibold transition-colors"
           >
             Pesquisar
           </button>
@@ -117,7 +117,7 @@ export default function CustomerPage() {
       <Dialog open={showLoading} onOpenChange={setShowLoading}>
         <DialogContent className="sm:max-w-md bg-white border-none shadow-lg rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-gray-800">
+            <DialogTitle className="text-lg font-bold text-brand-black">
               Buscando veículo...
             </DialogTitle>
           </DialogHeader>
@@ -136,7 +136,7 @@ export default function CustomerPage() {
             <X size={18} />
           </button>
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-red-600">
+            <DialogTitle className="text-lg font-bold text-red-600">
               Erro ao buscar veículo
             </DialogTitle>
           </DialogHeader>
@@ -164,12 +164,12 @@ export default function CustomerPage() {
             <X size={18} />
           </button>
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-green-600 text-center mb-6">
+            <DialogTitle className="text-lg font-bold text-brand text-center mb-6">
               Veículo encontrado
             </DialogTitle>
           </DialogHeader>
           {vehicleData && (
-            <div className="mt-4 text-gray-800 space-y-2">
+            <div className="mt-4 text-brand-black space-y-2">
               <p>
                 <span className="font-bold">Proprietário:</span>{" "}
                 {customerData?.name ?? "Carregando..."}
@@ -193,7 +193,7 @@ export default function CustomerPage() {
               <div className="flex justify-center">
                 <button
                   onClick={handleMoreDetails}
-                  className="mt-8 bg-blue-500 text-white px-4 py-2 rounded-lg"
+                  className="mt-8 bg-brand hover:bg-brand-hover text-white px-4 py-2 rounded-lg transition-colors"
                 >
                   Mais detalhes
                 </button>

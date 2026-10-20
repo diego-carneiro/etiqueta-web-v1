@@ -11,14 +11,15 @@ import { EmailInput } from "@/components/ui/input/email-input";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import { useRegisterCompany } from "@/api/hooks/useRegisterAuth";
+import BrandLogo from "@/components/BrandLogo";
 
 const ENABLE_VALIDATIONS = import.meta.env.VITE_ENABLE_VALIDATIONS !== "false";
 
 const STEPS = [
-  "Email e senha",
+  "E-mail e senha",
   "Informações loja",
   "Serviços",
-  "Dias e Horários",
+  "Dias e horários",
   "Termos de uso",
 ];
 
@@ -63,7 +64,6 @@ type StoreFormData = {
   cnpj: string;
   legalName: string;
   tradeName: string;
-  email: string;
   postalCode: string;
   street: string;
   number: string;
@@ -100,7 +100,6 @@ export default function SignUpPage() {
     cnpj: "",
     legalName: "",
     tradeName: "",
-    email: "",
     postalCode: "",
     street: "",
     number: "",
@@ -111,7 +110,6 @@ export default function SignUpPage() {
   const [storeFormErrors, setStoreFormErrors] = useState<
     Partial<Record<keyof StoreFormData, boolean>>
   >({});
-  const [isStoreEmailValid, setIsStoreEmailValid] = useState(true);
 
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>(DEFAULT_DAYS);
@@ -173,13 +171,6 @@ export default function SignUpPage() {
       showError(
         "Campos obrigatórios",
         "Todos os campos devem ser preenchidos antes de avançar. Verifique os campos destacados em vermelho.",
-      );
-      return false;
-    }
-    if (!isStoreEmailValid) {
-      showError(
-        "Formato inválido",
-        "O e-mail da loja não respeita o formato padrão.",
       );
       return false;
     }
@@ -302,15 +293,16 @@ export default function SignUpPage() {
   };
 
   const inputClass = (hasError?: boolean) =>
-    `bg-white text-gray-800 placeholder:text-gray-500 h-9 text-sm ${
+    `bg-white text-brand-black placeholder:text-gray-500 h-9 text-sm ${
       hasError
         ? "border-2 border-red-500 focus-visible:ring-red-500"
         : "border border-gray-300"
     }`;
 
   return (
-    <div className="w-screen h-screen flex bg-[#E5E5E5] overflow-hidden">
-      <aside className="w-1/4 bg-[#3358A5] flex items-center justify-center">
+    <div className="w-screen h-screen flex bg-brand-light overflow-hidden">
+      <aside className="relative w-1/4 bg-brand flex items-center justify-center">
+        <BrandLogo className="absolute top-10 left-1/2 w-[min(192px,70%)] -translate-x-1/2 text-brand-light" />
         <ul className="flex flex-col gap-10">
           {STEPS.map((label, i) => {
             const idx = i + 1;
@@ -318,7 +310,7 @@ export default function SignUpPage() {
             return (
               <li key={label} className="flex items-center gap-4">
                 <span
-                  className={`w-4 h-4 rounded-full ${active ? "bg-green-500 border-2 border-white" : "bg-white/50"}`}
+                  className={`w-4 h-4 rounded-full ${active ? "bg-brand-green border-2 border-brand-light" : "bg-white/50"}`}
                 />
                 <span
                   className={`text-sm font-medium ${active ? "text-white" : "text-white/80"}`}
@@ -331,28 +323,28 @@ export default function SignUpPage() {
         </ul>
       </aside>
 
-      <main className="flex-1 flex flex-col bg-[#E5E5E5]">
+      <main className="flex-1 flex flex-col bg-brand-light">
         <div className="flex-1 flex items-center justify-center overflow-y-auto px-4 py-8">
           <div className="w-full max-w-[900px]">
             {step === 1 && (
               <Card className="bg-transparent border-none shadow-none w-full max-w-[420px] mx-auto">
                 <CardContent className="flex flex-col gap-4 p-0">
                   <div className="mb-2">
-                    <Label htmlFor="email" className="text-[#3358A5] mb-2">
-                      Email
+                    <Label htmlFor="email" className="text-brand mb-2">
+                      E-mail
                     </Label>
                     <EmailInput
-                      placeholder="Digite seu email"
+                      placeholder="Digite seu e-mail"
                       value={email}
                       onChange={setEmail}
                       onValidityChange={setIsPrimaryEmailValid}
-                      className="bg-white text-gray-800 placeholder:text-gray-500 border-none focus-visible:ring-2 focus-visible:ring-green-500 mt-0"
+                      className="bg-white text-brand-black placeholder:text-gray-500 border-none focus-visible:ring-2 focus-visible:ring-brand mt-0"
                       required
                     />
                   </div>
 
                   <div className="mb-2">
-                    <Label htmlFor="password" className="text-[#3358A5] mb-2">
+                    <Label htmlFor="password" className="text-brand mb-2">
                       Senha
                     </Label>
                     <div className="relative">
@@ -362,7 +354,7 @@ export default function SignUpPage() {
                         placeholder="Digite sua senha"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="bg-white text-gray-800 placeholder:text-gray-500 pr-10 border-none focus-visible:ring-2 focus-visible:ring-green-500"
+                        className="bg-white text-brand-black placeholder:text-gray-500 pr-10 border-none focus-visible:ring-2 focus-visible:ring-brand"
                       />
                       <button
                         type="button"
@@ -381,7 +373,7 @@ export default function SignUpPage() {
                   <div className="mb-2">
                     <Label
                       htmlFor="confirmPassword"
-                      className="text-[#3358A5] mb-2"
+                      className="text-brand mb-2"
                     >
                       Confirmar senha
                     </Label>
@@ -392,7 +384,7 @@ export default function SignUpPage() {
                         placeholder="Digite sua senha novamente"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="bg-white text-gray-800 placeholder:text-gray-500 pr-10 border-none focus-visible:ring-2 focus-visible:ring-green-500"
+                        className="bg-white text-brand-black placeholder:text-gray-500 pr-10 border-none focus-visible:ring-2 focus-visible:ring-brand"
                       />
                       <button
                         type="button"
@@ -417,7 +409,7 @@ export default function SignUpPage() {
               <div className="w-full space-y-3">
                 <Card className="bg-white border border-gray-200 shadow-sm">
                   <CardContent className="px-4 py-3">
-                    <h3 className="text-[#3358A5] font-semibold text-sm mb-2 flex items-center gap-2">
+                    <h3 className="text-brand font-bold text-sm mb-2 flex items-center gap-2">
                       <svg
                         className="w-3.5 h-3.5"
                         fill="none"
@@ -433,7 +425,7 @@ export default function SignUpPage() {
                       </svg>
                       Company Data
                     </h3>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-3">
                       {(
                         [
                           {
@@ -451,38 +443,20 @@ export default function SignUpPage() {
                             label: "Nome fantasia",
                             placeholder: "Nome da loja",
                           },
-                          {
-                            key: "email",
-                            label: "E-mail",
-                            placeholder: "email@exemplo.com",
-                          },
                         ] as const
                       ).map(({ key, label, placeholder }) => (
                         <div key={key}>
-                          <Label className="text-[#3358A5] mb-1 text-xs block">
+                          <Label className="text-brand mb-1 text-xs block">
                             {label}
                           </Label>
-                          {key === "email" ? (
-                            <EmailInput
-                              value={storeFormData.email}
-                              onChange={(value) =>
-                                handleStoreFormChange("email", value)
-                              }
-                              onValidityChange={setIsStoreEmailValid}
-                              className={inputClass(storeFormErrors[key])}
-                              placeholder={placeholder}
-                              required
-                            />
-                          ) : (
-                            <Input
-                              value={storeFormData[key]}
-                              onChange={(e) =>
-                                handleStoreFormChange(key, e.target.value)
-                              }
-                              className={inputClass(storeFormErrors[key])}
-                              placeholder={placeholder}
-                            />
-                          )}
+                          <Input
+                            value={storeFormData[key]}
+                            onChange={(e) =>
+                              handleStoreFormChange(key, e.target.value)
+                            }
+                            className={inputClass(storeFormErrors[key])}
+                            placeholder={placeholder}
+                          />
                         </div>
                       ))}
                     </div>
@@ -491,7 +465,7 @@ export default function SignUpPage() {
 
                 <Card className="bg-white border border-gray-200 shadow-sm">
                   <CardContent className="px-4 py-3">
-                    <h3 className="text-[#3358A5] font-semibold text-sm mb-2 flex items-center gap-2">
+                    <h3 className="text-brand font-bold text-sm mb-2 flex items-center gap-2">
                       <svg
                         className="w-3.5 h-3.5"
                         fill="none"
@@ -539,7 +513,7 @@ export default function SignUpPage() {
                         ] as const
                       ).map(({ key, label, placeholder }) => (
                         <div key={key}>
-                          <Label className="text-[#3358A5] mb-1 text-xs block">
+                          <Label className="text-brand mb-1 text-xs block">
                             {label}
                           </Label>
                           <Input
@@ -558,7 +532,7 @@ export default function SignUpPage() {
 
                 <Card className="bg-white border border-gray-200 shadow-sm">
                   <CardContent className="px-4 py-3">
-                    <h3 className="text-[#3358A5] font-semibold text-sm mb-2 flex items-center gap-2">
+                    <h3 className="text-brand font-bold text-sm mb-2 flex items-center gap-2">
                       <svg
                         className="w-3.5 h-3.5"
                         fill="none"
@@ -590,7 +564,7 @@ export default function SignUpPage() {
                         ] as const
                       ).map(({ key, label, placeholder }) => (
                         <div key={key}>
-                          <Label className="text-[#3358A5] mb-1 text-xs block">
+                          <Label className="text-brand mb-1 text-xs block">
                             {label}
                           </Label>
                           <Input
@@ -612,7 +586,7 @@ export default function SignUpPage() {
             {step === 3 && (
               <div className="w-full space-y-6">
                 <div>
-                  <Label className="text-[#3358A5] mb-3 block text-base font-semibold">
+                  <Label className="text-brand mb-3 block text-base font-semibold">
                     Serviços prestados
                   </Label>
                   <div className="grid grid-cols-3 gap-3">
@@ -629,14 +603,14 @@ export default function SignUpPage() {
                             {service}
                           </span>
                           <div
-                            className={`relative w-11 h-6 rounded-full transition-colors ${isSelected ? "bg-gray-400" : "bg-gray-300"}`}
+                            className={`relative w-11 h-6 rounded-full transition-colors ${isSelected ? "bg-brand" : "bg-gray-300"}`}
                           >
                             <div
                               className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform flex items-center justify-center ${isSelected ? "translate-x-5" : "translate-x-0"}`}
                             >
                               {isSelected && (
                                 <svg
-                                  className="w-3 h-3 text-gray-600"
+                                  className="w-3 h-3 text-brand"
                                   fill="none"
                                   viewBox="0 0 24 24"
                                   stroke="currentColor"
@@ -662,8 +636,8 @@ export default function SignUpPage() {
             {step === 4 && (
               <div className="w-full space-y-6">
                 <div>
-                  <Label className="text-[#3358A5] mb-3 block text-base font-semibold">
-                    Dias / Horários
+                  <Label className="text-brand mb-3 block text-base font-semibold">
+                    Dias e horários
                   </Label>
                   <div className="space-y-2">
                     {schedules.map((schedule, index) => (
@@ -677,7 +651,7 @@ export default function SignUpPage() {
                           className="flex items-center gap-3 min-w-[140px]"
                         >
                           <div
-                            className={`relative w-11 h-6 rounded-full transition-colors ${schedule.active ? "bg-green-500" : "bg-gray-300"}`}
+                            className={`relative w-11 h-6 rounded-full transition-colors ${schedule.active ? "bg-brand" : "bg-gray-300"}`}
                           >
                             <div
                               className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform ${schedule.active ? "translate-x-5" : "translate-x-0"}`}
@@ -708,7 +682,7 @@ export default function SignUpPage() {
                                   updateSchedule(index, field, e.target.value)
                                 }
                                 disabled={!schedule.active}
-                                className={`px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent ${!schedule.active ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700"}`}
+                                className={`px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent ${!schedule.active ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700"}`}
                               >
                                 {availableTimeSlots.map((t) => (
                                   <option key={t} value={t}>
@@ -730,7 +704,7 @@ export default function SignUpPage() {
               <Card className="bg-transparent border-none shadow-none w-full">
                 <CardContent className="flex flex-col gap-6 p-0">
                   <div>
-                    <Label className="text-[#3358A5] mb-3 block text-base font-semibold">
+                    <Label className="text-brand mb-3 block text-base font-semibold">
                       Termos de uso
                     </Label>
                     <div className="bg-white rounded-lg shadow-inner p-4 h-[280px] overflow-y-auto border border-gray-200">
@@ -742,7 +716,7 @@ export default function SignUpPage() {
                         id="accept-terms"
                         checked={acceptedTerms}
                         onChange={(e) => setAcceptedTerms(e.target.checked)}
-                        className="w-5 h-5 text-green-500 border-gray-300 rounded focus:ring-green-500"
+                        className="w-5 h-5 accent-brand border-gray-300 rounded focus:ring-brand"
                       />
                       <label
                         htmlFor="accept-terms"
@@ -754,7 +728,7 @@ export default function SignUpPage() {
                   </div>
 
                   <div>
-                    <Label className="text-[#3358A5] mb-3 block text-base font-semibold">
+                    <Label className="text-brand mb-3 block text-base font-semibold">
                       Políticas de Privacidade
                     </Label>
                     <div className="bg-white rounded-lg shadow-inner p-4 h-[280px] overflow-y-auto border border-gray-200">
@@ -766,7 +740,7 @@ export default function SignUpPage() {
                         id="accept-privacy"
                         checked={acceptedPrivacy}
                         onChange={(e) => setAcceptedPrivacy(e.target.checked)}
-                        className="w-5 h-5 text-green-500 border-gray-300 rounded focus:ring-green-500"
+                        className="w-5 h-5 accent-brand border-gray-300 rounded focus:ring-brand"
                       />
                       <label
                         htmlFor="accept-privacy"
@@ -782,11 +756,11 @@ export default function SignUpPage() {
           </div>
         </div>
 
-        <div className="flex-shrink-0 border-gray-300 bg-[#E5E5E5] py-12">
+        <div className="flex-shrink-0 border-gray-300 bg-brand-light py-12">
           <div className="w-full max-w-[600px] mx-auto px-4 flex justify-between">
             <Button
               onClick={() => (step === 1 ? navigate("/sign-in") : prevStep())}
-              className="bg-green-500 hover:bg-green-600 text-white px-8 py-2"
+              className="bg-brand hover:bg-brand-hover text-white px-8 py-2"
             >
               Voltar
             </Button>
@@ -794,7 +768,7 @@ export default function SignUpPage() {
             {step < STEPS.length ? (
               <Button
                 onClick={handleAdvance}
-                className="bg-green-500 hover:bg-green-600 text-white px-8 py-2"
+                className="bg-brand hover:bg-brand-hover text-white px-8 py-2"
               >
                 Avançar
               </Button>
@@ -804,7 +778,7 @@ export default function SignUpPage() {
                 disabled={
                   ENABLE_VALIDATIONS && (!acceptedTerms || !acceptedPrivacy)
                 }
-                className="bg-green-500 hover:bg-green-600 text-white px-8 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-brand hover:bg-brand-hover text-white px-8 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Finalizar
               </Button>

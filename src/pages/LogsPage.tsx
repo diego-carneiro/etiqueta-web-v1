@@ -82,8 +82,8 @@ export default function LogsPage() {
       pages.push(
         <span
           key={i}
-          className={`cursor-pointer hover:text-blue-600 font-medium ${
-            i === currentPage ? "text-blue-600 font-semibold" : "text-gray-500"
+          className={`cursor-pointer hover:text-brand font-medium ${
+            i === currentPage ? "text-brand font-semibold" : "text-gray-500"
           }`}
           onClick={() => handlePageChange(i)}
         >
@@ -96,7 +96,7 @@ export default function LogsPage() {
         {pages}
         {currentPage < totalPages && (
           <span
-            className="cursor-pointer hover:text-blue-600 font-medium"
+            className="cursor-pointer hover:text-brand font-medium"
             onClick={() => handlePageChange(currentPage + 1)}
           >
             Próx
@@ -108,7 +108,7 @@ export default function LogsPage() {
 
   if (isError) {
     return (
-      <div className="p-10 bg-gray-100 min-h-screen">
+      <div className="p-10 bg-brand-light min-h-screen">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Erro ao carregar histórico: {error?.message || "Erro desconhecido"}
         </div>
@@ -117,7 +117,7 @@ export default function LogsPage() {
   }
 
   return (
-    <div className="p-10 bg-gray-100 min-h-screen space-y-8">
+    <div className="p-10 bg-brand-light min-h-screen space-y-8">
       <div className="bg-white rounded-xl shadow-sm p-6 flex flex-wrap items-end gap-4 w-140">
         <div className="flex flex-col">
           <label className="text-gray-600 font-medium mb-1">
@@ -125,7 +125,7 @@ export default function LogsPage() {
           </label>
           <Input
             placeholder="Digite o ID"
-            className="bg-white border-none focus:ring-2 focus:ring-gray-200 focus:outline-none"
+            className="bg-white border-none focus:ring-2 focus:ring-brand/40 focus:outline-none"
             value={employeeIdInput}
             onChange={(e) => setEmployeeIdInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleFilter()}
@@ -138,7 +138,7 @@ export default function LogsPage() {
           </label>
           <Input
             placeholder="Digite a placa"
-            className="bg-white border-none focus:ring-2 focus:ring-gray-200 focus:outline-none"
+            className="bg-white border-none focus:ring-2 focus:ring-brand/40 focus:outline-none"
             value={vehiclePlateInput}
             onChange={(e) => setVehiclePlateInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleFilter()}
@@ -146,7 +146,7 @@ export default function LogsPage() {
         </div>
 
         <Button
-          className="bg-green-500 text-white hover:bg-green-600 font-semibold px-6 py-2 rounded-md"
+          className="bg-brand text-white hover:bg-brand-hover font-semibold px-6 py-2 rounded-md"
           onClick={handleFilter}
           disabled={isLoading}
         >
@@ -199,7 +199,7 @@ export default function LogsPage() {
               paginatedData.map((log, index) => (
                 <TableRow
                   key={`${log.employeeId}-${log.vehicleId}-${index}`}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors text-gray-700"
+                  className="border-b border-gray-100 hover:bg-brand-light/60 transition-colors text-gray-700"
                 >
                   <TableCell className="py-4">{log.employeeName}</TableCell>
                   <TableCell className="py-4">

@@ -1,10 +1,11 @@
 import UserForms from "@/components/UserForms";
+import BrandLogo from "@/components/BrandLogo";
 
 export default function RedefinePasswordPage() {
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-brand-light">
       <div className="flex-1 hidden lg:flex items-center justify-center">
-        <img src="./img/etiquetalogolarge.png" />
+        <BrandLogo className="w-[min(560px,70%)] text-brand" />
       </div>
       <div className="w-full lg:w-1/3">
         <UserForms selector="redefinePassword" />

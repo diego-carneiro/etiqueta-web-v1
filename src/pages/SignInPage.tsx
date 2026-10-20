@@ -1,5 +1,6 @@
 import { useState } from "react";
 import UserForms from "@/components/UserForms";
+import BrandLogo from "@/components/BrandLogo";
 import WaitingApproval from "@/components/WaitingApproval";
 
 export default function SignInPage() {
@@ -10,9 +11,9 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-200">
+    <div className="flex h-screen bg-brand-light">
       <div className="flex-1 hidden lg:flex items-center justify-center">
-        <img src="./img/etiquetalogolarge.png" alt="Sign In" />
+        <BrandLogo className="w-[min(560px,70%)] text-brand" />
       </div>
 
       <div className="w-full lg:w-1/3">

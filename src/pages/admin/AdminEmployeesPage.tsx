@@ -82,7 +82,7 @@ export default function AdminEmployeesPage() {
 
   if (isError) {
     return (
-      <div className="flex flex-col h-screen bg-gray-100 p-12 overflow-hidden">
+      <div className="flex flex-col h-screen bg-brand-light p-12 overflow-hidden">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Erro ao carregar funcionários: {error?.message || "Erro desconhecido"}
         </div>
@@ -95,11 +95,11 @@ export default function AdminEmployeesPage() {
       <div className="flex justify-between items-start">
         <Card className="bg-white border-none shadow-sm w-46 h-24 flex-shrink-0 flex items-center justify-center">
           <CardContent className="flex items-center justify-center gap-4 p-5">
-            <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-              <UsersRound className="text-green-600 h-5 w-5" />
+            <div className="flex items-center justify-center w-10 h-10 bg-brand-light rounded-full">
+              <UsersRound className="text-brand h-5 w-5" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-800">
+              <p className="font-display text-2xl font-extrabold text-brand-black">
                 {isLoading ? "..." : totalCount}
               </p>
               <p className="text-sm text-gray-500">Funcionários</p>
@@ -140,7 +140,7 @@ export default function AdminEmployeesPage() {
 
       <div className="flex-1 min-h-0 bg-white rounded-xl shadow-sm overflow-hidden flex flex-col">
         <div className="px-6 pt-5 pb-2 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-gray-700">Funcionários</h2>
+          <h2 className="text-sm font-bold text-brand-black">Funcionários</h2>
         </div>
 
         <div className="overflow-y-auto p-4">
@@ -177,7 +177,7 @@ export default function AdminEmployeesPage() {
                 visibleEmployees.map((employee, index) => (
                   <TableRow
                     key={employee.id}
-                    className="cursor-pointer border-0 hover:bg-gray-50 transition-colors"
+                    className="cursor-pointer border-0 hover:bg-brand-light/60 transition-colors"
                   >
                     <TableCell>
                       {(currentPage - 1) * PAGE_SIZE + index + 1}
@@ -203,7 +203,7 @@ export default function AdminEmployeesPage() {
               <button
                 onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-brand-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -234,8 +234,8 @@ export default function AdminEmployeesPage() {
                       onClick={() => handlePageChange(item as number)}
                       className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                         currentPage === item
-                          ? "bg-gray-800 text-white"
-                          : "text-gray-600 hover:bg-gray-100"
+                          ? "bg-brand text-white"
+                          : "text-gray-600 hover:bg-brand-light"
                       }`}
                     >
                       {item}
@@ -248,7 +248,7 @@ export default function AdminEmployeesPage() {
                   handlePageChange(Math.min(totalPages, currentPage + 1))
                 }
                 disabled={currentPage === totalPages}
-                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-brand-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>

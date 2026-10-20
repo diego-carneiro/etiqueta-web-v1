@@ -48,7 +48,7 @@ export default function EmployeeRegister() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-300 px-8 flex items-center">
+    <div className="min-h-screen bg-brand-light px-8 flex items-center">
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 w-100 mx-auto"
@@ -76,7 +76,7 @@ export default function EmployeeRegister() {
         </div>
 
         <div className="flex flex-col space-y-1">
-          <label className="text-sm font-medium text-gray-700">Email</label>
+          <label className="text-sm font-medium text-gray-700">E-mail</label>
           <Input
             name="email"
             type="email"
@@ -103,7 +103,7 @@ export default function EmployeeRegister() {
           <Button
             type="submit"
             disabled={isPending}
-            className="bg-green-500 text-white hover:bg-green-600 w-full"
+            className="bg-brand text-white hover:bg-brand-hover w-full"
           >
             {isPending ? "Cadastrando..." : "Cadastrar"}
           </Button>

@@ -79,7 +79,7 @@ export default function AdminLogsPage() {
 
   if (isError) {
     return (
-      <div className="flex flex-col h-screen bg-gray-100 p-12 overflow-hidden">
+      <div className="flex flex-col h-screen bg-brand-light p-12 overflow-hidden">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Erro ao carregar logs: {error?.message || "Erro desconhecido"}
         </div>
@@ -92,11 +92,11 @@ export default function AdminLogsPage() {
       <div className="flex justify-between items-center mb-8">
         <Card className="bg-white border-none shadow-sm w-46 h-24 flex-shrink-0 flex items-center justify-center ">
           <CardContent className="flex items-center justify-center gap-4 p-5">
-            <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-              <UsersRound className="text-green-600 h-5 w-5" />
+            <div className="flex items-center justify-center w-10 h-10 bg-brand-light rounded-full">
+              <UsersRound className="text-brand h-5 w-5" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-800">{totalCount}</p>
+              <p className="font-display text-2xl font-extrabold text-brand-black">{totalCount}</p>
               <p className="text-sm text-gray-500">Registros</p>
             </div>
           </CardContent>
@@ -113,7 +113,7 @@ export default function AdminLogsPage() {
               value={employeeNameInput}
               onChange={(e) => setEmployeeNameInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="w-64 bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-64 bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand/40"
             />
           </div>
 
@@ -127,14 +127,14 @@ export default function AdminLogsPage() {
               value={vehiclePlateInput}
               onChange={(e) => setVehiclePlateInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="w-64 bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-64 bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand/40"
             />
           </div>
 
           <button
             onClick={handleSearch}
             disabled={isLoading}
-            className="mt-6 bg-green-600 text-white font-medium px-5 py-2 rounded-lg hover:bg-green-700 transition"
+            className="mt-6 bg-brand text-white font-medium px-5 py-2 rounded-lg hover:bg-brand-hover transition"
           >
             {isLoading ? (
               <span className="inline-flex items-center">
@@ -183,7 +183,7 @@ export default function AdminLogsPage() {
                 logs.map((log, index) => (
                   <TableRow
                     key={`${log.id}-${index}`}
-                    className="cursor-pointer border-0 hover:bg-gray-50 transition-colors"
+                    className="cursor-pointer border-0 hover:bg-brand-light/60 transition-colors"
                   >
                     <TableCell>{log.employeeName}</TableCell>
                     <TableCell>{log.vehicleLicensePlate}</TableCell>
@@ -208,7 +208,7 @@ export default function AdminLogsPage() {
               <button
                 onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-brand-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -239,8 +239,8 @@ export default function AdminLogsPage() {
                       onClick={() => handlePageChange(item as number)}
                       className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                         currentPage === item
-                          ? "bg-gray-800 text-white"
-                          : "text-gray-600 hover:bg-gray-100"
+                          ? "bg-brand text-white"
+                          : "text-gray-600 hover:bg-brand-light"
                       }`}
                     >
                       {item}
@@ -253,7 +253,7 @@ export default function AdminLogsPage() {
                   handlePageChange(Math.min(totalPages, currentPage + 1))
                 }
                 disabled={currentPage === totalPages}
-                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-brand-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>

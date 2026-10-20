@@ -55,7 +55,7 @@ export default function AddLabel() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center p-4">
+    <div className="min-h-screen w-full bg-brand-light flex items-center justify-center p-4">
       <div className="relative w-full max-w-3xl bg-white rounded-xl shadow-lg p-6">
         <Button
           variant="ghost"
@@ -68,7 +68,7 @@ export default function AddLabel() {
 
         <Card className="w-full shadow-none border-none bg-white">
           <CardContent className="p-2 space-y-6">
-            <h1 className="text-2xl font-bold text-gray-800 text-center">
+            <h1 className="text-2xl font-extrabold text-brand text-center">
               Adicionar Novo Item
             </h1>
 
@@ -77,7 +77,7 @@ export default function AddLabel() {
                 <span className="block text-sm font-medium text-gray-700">
                   KM Atual:
                 </span>
-                <p className="mt-1 text-gray-900">{currentMileage}</p>
+                <p className="mt-1 text-brand-black">{currentMileage}</p>
               </div>
 
               <div>
@@ -138,7 +138,7 @@ export default function AddLabel() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+                className="w-full flex items-center justify-center gap-2 bg-brand hover:bg-brand-hover text-white"
               >
                 <Save size={18} />
                 {loading ? "Salvando..." : "Salvar"}

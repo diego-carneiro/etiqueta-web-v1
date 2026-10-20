@@ -41,7 +41,7 @@ export default function SuccessModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-brand-black/40 backdrop-blur-sm"
         style={{ animation: "fadeIn 0.2s ease" }}
       />
 
@@ -49,9 +49,9 @@ export default function SuccessModal({
         className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden"
         style={{ animation: "slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
       >
-        <div className="h-1.5 bg-gray-100 w-full">
+        <div className="h-1.5 bg-brand-light w-full">
           <div
-            className="h-full bg-green-500 transition-all duration-1000 ease-linear"
+            className="h-full bg-brand transition-all duration-1000 ease-linear"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -59,16 +59,16 @@ export default function SuccessModal({
         <div className="px-8 py-8 flex flex-col items-center text-center gap-4">
           <div className="relative flex items-center justify-center">
             <span
-              className="absolute w-20 h-20 rounded-full bg-green-100 opacity-60"
+              className="absolute w-20 h-20 rounded-full bg-brand-light opacity-60"
               style={{ animation: "pulse 1.8s ease-in-out infinite" }}
             />
-            <div className="relative w-16 h-16 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-200">
-              <CheckCircle2 className="w-8 h-8 text-white" strokeWidth={2.5} />
+            <div className="relative w-16 h-16 rounded-full bg-brand flex items-center justify-center shadow-lg shadow-brand/25">
+              <CheckCircle2 className="w-8 h-8 text-brand-green" strokeWidth={2.5} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <h2 className="text-xl font-bold text-gray-800 tracking-tight">
+            <h2 className="text-xl font-extrabold text-brand-black tracking-tight">
               Cadastro realizado!
             </h2>
             <p className="text-sm text-gray-500 leading-relaxed">
@@ -77,7 +77,7 @@ export default function SuccessModal({
           </div>
 
           <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-4 py-1.5">
-            <span className="w-5 h-5 rounded-full bg-green-500 text-white text-xs font-bold flex items-center justify-center leading-none">
+            <span className="w-5 h-5 rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center leading-none">
               {count}
             </span>
             <span className="text-xs text-gray-500 font-medium">

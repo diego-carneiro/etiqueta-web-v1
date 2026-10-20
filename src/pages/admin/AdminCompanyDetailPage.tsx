@@ -40,15 +40,15 @@ export default function AdminCompanyDetailPage() {
           <Card
             onClick={() => setView("verified")}
             className={`cursor-pointer bg-white border-none shadow-sm transition-all hover:shadow-md ${
-              view === "verified" ? "ring-2 ring-green-400" : ""
+              view === "verified" ? "ring-2 ring-brand" : ""
             }`}
           >
             <CardContent className="flex items-center gap-3 px-5 py-3">
-              <div className="flex items-center justify-center w-9 h-9 bg-green-100 rounded-lg">
-                <UsersRound className="text-green-600 h-4 w-4" />
+              <div className="flex items-center justify-center w-9 h-9 bg-brand-light rounded-lg">
+                <UsersRound className="text-brand h-4 w-4" />
               </div>
               <div>
-                <p className="text-base font-bold text-gray-800">
+                <p className="font-display text-base font-extrabold text-brand-black">
                   {verifiedCompanies.length}
                 </p>
                 <p className="text-sm text-gray-500">Lojas verificadas</p>
@@ -67,7 +67,7 @@ export default function AdminCompanyDetailPage() {
                 <UsersRound className="text-yellow-600 h-4 w-4" />
               </div>
               <div>
-                <p className="text-base font-bold text-gray-800">
+                <p className="font-display text-base font-extrabold text-brand-black">
                   {pendingCompanies.length}
                 </p>
                 <p className="text-sm text-gray-500">Lojas pendentes</p>
@@ -83,7 +83,7 @@ export default function AdminCompanyDetailPage() {
             <TableHeader>
               <TableRow className="border-b border-gray-200">
                 <TableHead>Nome da loja</TableHead>
-                <TableHead>Email</TableHead>
+                <TableHead>E-mail</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -99,7 +99,7 @@ export default function AdminCompanyDetailPage() {
                     <span
                       className={`text-xs font-medium px-3 py-1 rounded-full ${
                         company.approvalStatus === 1
-                          ? "bg-green-50 text-green-600"
+                          ? "bg-brand-light text-brand"
                           : "bg-yellow-50 text-yellow-600"
                       }`}
                     >
