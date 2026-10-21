@@ -207,6 +207,12 @@ export default function UserForms({
               >
                 Recuperar
               </Button>
+              <Button
+                onClick={() => navigate("/sign-in")}
+                className="bg-transparent border-2 border-brand-light text-brand-light hover:bg-white/10 font-bold rounded-full"
+              >
+                Voltar para o login
+              </Button>
             </CardContent>
           </Card>
         )}
