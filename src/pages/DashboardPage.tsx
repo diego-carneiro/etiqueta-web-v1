@@ -8,7 +8,7 @@ export default function UserDashboard() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-brand-light px-6">
-        <p className="text-gray-500 text-lg">Carregando dados do dashboard...</p>
+        <p className="text-gray-500 text-lg">Carregando dados do painel...</p>
       </div>
     );
   }
@@ -17,7 +17,7 @@ export default function UserDashboard() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-brand-light px-6">
         <p className="text-red-500 text-lg">
-          Erro ao carregar dados do dashboard.
+          Erro ao carregar dados do painel.
         </p>
       </div>
     );

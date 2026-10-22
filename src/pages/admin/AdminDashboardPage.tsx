@@ -22,7 +22,7 @@ export default function AdminDashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-brand-light">
         <p className="text-gray-500 text-lg">
-          Carregando dados do dashboard...
+          Carregando dados do painel...
         </p>
       </div>
     );
@@ -32,7 +32,7 @@ export default function AdminDashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-brand-light">
         <p className="text-red-500 text-lg">
-          Erro ao carregar os dados do dashboard.
+          Erro ao carregar os dados do painel.
         </p>
       </div>
     );

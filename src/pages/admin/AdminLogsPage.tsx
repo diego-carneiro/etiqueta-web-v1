@@ -167,7 +167,7 @@ export default function AdminLogsPage() {
                     colSpan={5}
                     className="text-center text-gray-400 py-8 border-0"
                   >
-                    Carregando logs...
+                    Carregando histórico...
                   </TableCell>
                 </TableRow>
               ) : logs.length === 0 ? (

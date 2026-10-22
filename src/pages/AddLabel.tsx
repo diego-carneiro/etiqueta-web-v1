@@ -23,7 +23,7 @@ export default function AddLabel() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!vehicleId) {
-      alert("VehicleId não encontrado!");
+      alert("Veículo não encontrado!");
       return;
     }
 
@@ -48,7 +48,7 @@ export default function AddLabel() {
       navigate(-1);
     } catch (err: any) {
       console.error(err);
-      alert("Erro ao salvar label");
+      alert("Erro ao salvar etiqueta");
     } finally {
       setLoading(false);
     }
